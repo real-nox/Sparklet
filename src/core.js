@@ -1,7 +1,7 @@
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const { config } = require("dotenv"); config({ quiet: true });
+const { commandHandler } = require("./handler/commandHandler");
 const { eventHandler } = require("./handler/eventHandler");
-const { DBHandler, DB } = require("./handler/dbHandler");
 const color = require("colors");
 
 let bot = new Client({
@@ -19,10 +19,11 @@ bot.commands = new Collection()
 bot.login(process.env.TOKEN).then(() => {
     try {
         eventHandler(bot)
-        DBHandler()
+        commandHandler(bot)
+        //DBHandler()
     } catch (err) {
         eventHandler(bot)
-        DBHandler()
+        //DBHandler()
         console.error(color.red("[ERROR] "), err)
     }
 });
