@@ -1,29 +1,37 @@
+const asciiTable = require("ascii-table");
 const colors = require("colors")
 const fs = require("fs");
 const path = require("path");
+const { Print } = require("./extraHandler");
+let table = new asciiTable('Events')
 
-let events = "____________"
+table.setHeading("Name", "Execute")
+
 function eventHandler(client) {
     try {
         const eventsFolder = path.join(__dirname, '../events');
         const eventsFiles = fs.readdirSync(eventsFolder).filter((file) => file.endsWith(".js"));
 
         for (const file of eventsFiles) {
-            
+
             const filepath = path.join(eventsFolder, file)
             const event = require(filepath)
-            if (event.once) {
-                client.once(event.name, (...args) => event.eventrun(client, ...args))
+            if (!event.name) { 
+                table.addRow(file, "Unloaded") 
             } else {
-                client.on(event.name, (...args) => event.eventrun(client, ...args));
+                if (event.once) {
+                    client.once(event.name, (...args) => event.eventrun(client, ...args))
+                } else {
+                    client.on(event.name, (...args) => event.eventrun(client, ...args));
+                }
+                table.addRow(file, "Loaded")
             }
-            events+="\n"+file
         }
 
-        console.log(colors.red(events))
+        Print(table.toString(), "Red")
     } catch (err) {
-        console.log("[ERROR] : ", err)
+        Print("[ERROR] " + err, "Red")
     }
 }
 
-module.exports = {eventHandler}
+module.exports = { eventHandler }

@@ -1,9 +1,10 @@
 const { ActivityType } = require("discord.js");
+const { Print } = require("../handler/extraHandler");
 
 module.exports = {
     name : "clientReady",
     eventrun(client) {
-        console.log("Hey chef I'm on!! And ur so cool ikr");
+        Print("[CLIENT] Bot Is functioning", "Green");
         client.user.setPresence({ activities: [{ name: "Getting coded by ranox", type: ActivityType.Playing }] });
     }
 }

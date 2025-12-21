@@ -1,26 +1,30 @@
-const { MongoClient, ServerApiVersion, Db } = require("mongodb")
-const {config} = require("dotenv"); config({quiet : true})
+const { yellow } = require("colors")
+const oracledb = require("oracledb")
 
-const URI = process.env.URIDB
-const DB = new MongoClient(URI, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
-})
+oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT
 
-async function DBHandler() {
+let DB
+async function LoaddDB() {
     try {
-        await DB.connect()
-        await DB.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        oracledb.initOracleClient({
+            libDir: "C:\\Users\\rayan\\Downloads\\instantclient-basic-windows.x64-19.29.0.0.0dbru\\instantclient_19_29"
+        })
 
-    } catch (err) {
-        console.error("[ERROR] ", err)
+        await oracledb.createPool({
+            user: 'system',
+            password: 'Rayane10.',
+            connectString: '127.0.0.1:1521/XE'
+        })
 
-    } finally {
+        DB = await oracledb.getConnection()
+
+        if (!DB) return Error("[ERROR] | Database ERROR")
+
+        console.log(yellow("[DATABASE] : Database loaded"))
+        return DB
+    } catch (error) {
+        Print("[ERROR] " + error, "Red")
     }
 }
 
-module.exports = {DBHandler, DB}
+module.exports = { LoaddDB, DB }

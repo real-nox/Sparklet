@@ -1,6 +1,6 @@
 {
   "name": "sparklet",
-  "version": "0.0.1",
+  "version": "0.1",
   "description": "Sparklet bot",
   "main": "src/core.js",
   "scripts": {
@@ -9,10 +9,11 @@
   "author": "Ranox",
   "license": "ISC",
   "dependencies": {
+    "ascii-table": "^0.0.9",
     "colors": "^1.4.0",
     "discord.js": "^14.25.1",
     "dotenv": "^17.2.3",
-    "mongodb": "^7.0.0",
+    "oracledb": "^5.5.0",
     "typescript": "^5.9.3"
   }
 }

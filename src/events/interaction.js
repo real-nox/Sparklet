@@ -15,8 +15,9 @@ module.exports = {
 
                 command.execute(interaction)
             }
-                } catch (err) {
-            console.error("[ERROR] : ", err)
+                } catch (error) {
+                    Print("[ERROR] " + error, "Red")
+
         }
     }
 }

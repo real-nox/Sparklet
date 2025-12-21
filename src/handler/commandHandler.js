@@ -1,38 +1,66 @@
+const { config } = require("dotenv"); config({ quiet: true })
 const { REST, Routes } = require("discord.js")
-const { config } = require("dotenv")
-const fs = require("fs")
-config()
+const { Print } = require("./extraHandler");
+const asciiTable = require("ascii-table");
 const path = require("path")
+const fs = require("fs");
 
 const cmds = []
+const prefixs = []
+
+const cmdTable = new asciiTable("Commands")
+cmdTable.setHeading("Name", "Type", "Execute")
 
 function commandHandler(client) {
-    const cmdFolder = path.join(__dirname, "../cmd")
-    const cmdFiles = fs.readdirSync(cmdFolder).filter((file) => file.endsWith(".js"))
+    try {
+        const CMDFolder = path.join(__dirname, "../cmd/slash")
+        const PREFolder = path.join(__dirname, "../cmd/prefix")
+        const cmdFiles = fs.readdirSync(CMDFolder).filter((file) => file.endsWith(".js"))
+        const preFiles = fs.readdirSync(PREFolder).filter((file) => file.endsWith(".js"))
 
-    for (file of cmdFiles) {
-        const filepath = path.join(cmdFolder, file)
-        const cmd = require(filepath)
-        if ('data' in cmd && 'execute' in cmd) {
-            client.commands.set(cmd.data.name, cmd)
-            cmds.push(cmd.data.toJSON())
-        } else {
-            console.log("no cmd recognized")
+        for (const file of cmdFiles) {
+            const filepath = path.join(CMDFolder, file)
+            const cmd = require(filepath)
+
+            if ('data' in cmd && 'execute' in cmd) {
+                client.commands.set(cmd.data.name, cmd)
+                cmds.push(cmd.data.toJSON())
+                cmdTable.addRow(file, "Slash", "Loaded")
+            } else {
+                cmdTable.addRow(file, "Slash", "Unloaded")
+            }
         }
-        console.log(`adding new cmd ${cmds.length}`)
+
+
+        client.application.commands.set(cmds)
+
+        for (const file of preFiles) {
+            const filepath = path.join(PREFolder, file)
+            const pre = require(filepath)
+
+            if (pre.prerun || pre.name) {
+                client.prefixs.set(pre.name, pre)
+                prefixs.push(pre.name)
+                cmdTable.addRow(file, "Prefix", "Loaded")
+            } else {
+                cmdTable.addRow(file, "Prefix", "Unloaded")
+            }
+        }
+
+        Print(cmdTable.toString(), "Blue")
+
+        const rest = new REST().setToken(process.env.TOKEN);
+        (async () => {
+            try {
+                Print(`> Started refreshing ${cmds.length} application (/) commands.`, "Yellow");
+                const data = await rest.put(Routes.applicationCommands(client.user.id), { body: cmds });
+                Print(`> Successfully reloaded ${data.length} application (/) commands.`, "Green");
+            } catch (error) {
+                Print("[ERROR] " + error, "Red")
+            }
+        })()
+    } catch (error) {
+        Print("[ERROR] " + error, "Red")
     }
-
-    client.application.commands.set(cmds)
-
-    const rest = new REST().setToken(process.env.TOKEN);
-    (async () => {
-        try {
-            console.log(`Started refreshing ${cmds.length} application (/) commands.`);
-            const data = await rest.put(Routes.applicationCommands(client.user.id), { body: cmds });
-            console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-        } catch (error) {
-            console.error(error);
-        }
-    })()
 }
 module.exports = { commandHandler }
