@@ -1,13 +1,12 @@
-const color = require("colors")
-const path = require("path")
-const fs = require("fs");
-const { ErrorLog } = require("../handler/extraHandler");
+const { ErrorLog, Print } = require("../handler/extraHandler");
 
 module.exports = {
     name: "messageCreate",
     async eventrun(client, mg) {
         try {
             if (mg.author.bot) return;
+            if (!mg.guild) return;
+
             const prefix = "!";
             const args = mg.content.slice(prefix.length).trim().split(/ +/);
             const command = args.shift().toLowerCase();

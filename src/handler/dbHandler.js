@@ -1,40 +1,32 @@
 const { config } = require("dotenv");
-const oracledb = require("oracledb");
+const { createConnection } = require("mysql2")
 const { ErrorLog, Print } = require("./extraHandler");
-const { EconomyCreateT } = require("../data/Tables");
+const { LoadRGL } = require("../data/RGLDB");
 config({ quiet: true });
-
-oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
 let DB;
 
 async function LoaddDB() {
     try {
-        oracledb.initOracleClient({
-            libDir: "C:\\Users\\rayan\\Downloads\\instantclient-basic-windows.x64-19.29.0.0.0dbru\\instantclient_19_29"
-        });
 
-        await oracledb.createPool({
+        DB = createConnection({
+            host: process.env.host,
             user: process.env.user,
+            port: process.env.port,
+            database: process.env.database,
             password: process.env.password,
-            connectString: process.env.connectString
         });
 
-        DB = await oracledb.getConnection();
+        DB.connect(function (err) {
+            if (err) throw err;
+            Print("[DATABASE] Connected to the MySQL database!", "Cyan")
+        });
 
-        if (!DB) {
-            Print("[DATABASE] : Database didn\'t load correctly!", "Red");
-            return ErrorLog("DATABASE", "Database didn\'t load correctly!");
-        }
-
-        Print("[DATABASE] : Database loaded", "Yellow");
-
-        DB;
-        await EconomyCreateT(DB);
+        LoadRGL(DB)
     } catch (error) {
         Print("[ERROR] " + error, "Red");
         ErrorLog("DATABASE", error);
     }
 }
 
-module.exports = { LoaddDB }
+module.exports = { LoaddDB, DB }

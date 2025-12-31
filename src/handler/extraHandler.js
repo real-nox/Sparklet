@@ -1,5 +1,5 @@
 const { config } = require("dotenv"); config({ quiet: true })
-const { green, yellow, red, blue } = require("colors");
+const { green, yellow, red, blue, cyan } = require("colors");
 const { WebhookClient, EmbedBuilder } = require("discord.js");
 
 function Print(message, type = "Green") {
@@ -12,6 +12,8 @@ function Print(message, type = "Green") {
             console.log(red(message))
         if (type == "Blue")
             console.log(blue(message))
+        if (type == "Cyan")
+            console.log(cyan(message))
     } catch (err) {
         console.log(red(message))
     }
