@@ -33,18 +33,18 @@ async function LoadRGL(DB) {
 
 async function gameStart(data, guildID, channelID) {
     try {
-        await data.promise().query(`select ongoing from rgl_games where (guildid =? && channelid=? && ongoing=true)`, [guildID, channelID,])
-            .then(async (resu) => {
-                if (resu[0].length == 0) {
-                    await data.promise().query(`Insert into rgl_games (guildID, channelID, ongoing) values (?,?,?)`,
-                        [guildID, channelID, true])
-                        .then((res) => {
-                            if (res) console.log(res)
-                        })
-                } else {
-                    console.log("there is an ongoing game")
-                }
-            })
+        const ongame = getGameOngoing(data, guildID, channelID);
+
+        if (ongame) return console.log("there is no an ongoing game");
+
+        const [starting] = await data.promise().query(
+            `Insert into rgl_games (guildID, channelID, ongoing) values (?,?,?)`,
+            [guildID, channelID, true]
+        );
+
+        if (starting) return true;
+        return false;
+
     } catch (err) {
         Print("[RGLDB] " + err, "Red");
         ErrorLog("RGLDB", err);
@@ -53,22 +53,19 @@ async function gameStart(data, guildID, channelID) {
 
 async function gameEnd(data, guildID, channelID) {
     try {
-        const [ongame] = await data.promise().query(
-            `select ongoing from rgl_games where (guildid =? && channelid=? && ongoing=true)`,
-            [guildID, channelID,]
-        );
+        if (!(guildID && channelID)) return null;
 
-        if (ongame.length == 0) return console.log("there is no an ongoing game");
+        const ongame = getGameOngoing(data, guildID, channelID);
 
-        const [thegame] = await data.promise().query(
-            `delete from rgl_games where (guildID=? && channelID=? && ongoing = true)`,
-            [guildID, channelID,]
-        );
+        if (ongame) {
 
-        if (thegame) {
-            return true;
-        } else {
-            return false
+            let [thegame] = await data.promise().query(
+                `delete from rgl_games where (guildID=? && channelID=? && ongoing = true)`,
+                [guildID, channelID]
+            );
+
+            if (thegame) return true;
+            return false;
         }
     } catch (err) {
         Print("[RGLDB] " + err, "Red");
@@ -76,17 +73,21 @@ async function gameEnd(data, guildID, channelID) {
     }
 }
 
-async function getGameBYID(data, ID) {
+async function getGameOngoing(data, guildID, channelID) {
     try {
-        if (!ID) return null;
+        if (!(guildID && channelID)) return null;
 
-        await data.promise().query(`select * from rgl_games where gameid=${ID}`).then(res => {
-            if (res[0].length == 0) return false;
-        })
+        let [resultat] = await data.promise().query(
+            `select * from rgl_games where (guildID=? && channelID=? && ongoing = true)`,
+            [guildID, channelID]
+        );
+
+        if (resultat.length == 0) return false;
+        return true;
     } catch (err) {
         Print("[RGLDB] " + err, "Red");
         ErrorLog("RGLDB", err);
     }
 }
 
-module.exports = { LoadRGL, gameStart, gameEnd, getGameBYID }
+module.exports = { LoadRGL, gameStart, gameEnd, getGameOngoing }

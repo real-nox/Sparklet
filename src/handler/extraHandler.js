@@ -32,4 +32,9 @@ function ErrorLog(title, message) {
     }
 }
 
-module.exports = { Print, ErrorLog }
+async function delay(time) {
+    time = time*1000;
+    return new Promise(reso => setTimeout(reso, time));
+}
+
+module.exports = { Print, ErrorLog, delay }
