@@ -1,5 +1,5 @@
 const RGLGame = require("../../classes/RGLFunction")
-const { getGameOngoing, gameStart } = require("../../data/RGLDB")
+const { getGameOngoing } = require("../../data/RGLDB")
 const { DB } = require("../../handler/dbHandler")
 
 module.exports = {
@@ -13,7 +13,8 @@ module.exports = {
 
         if (Game) return mg.reply("# There is an ongoing game!")
 
-        const RGL = await new RGLGame(client, mg, DB).Starter()
+        await new RGLGame(client, mg, DB).Starter()
+        
         //gameStart(DB, guildID, channelID)
         //mg.reply("starting")
     }
