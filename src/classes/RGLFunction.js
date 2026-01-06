@@ -75,7 +75,7 @@ class RGLGame {
 
                             if (!(msg.content.includes("rgl -end") && this.mg.author == msg.author)) {
                                 if (this.light === "Red") {
-                                    msg.react("☠️");
+                                    msg.react("🪦");
                                     this.RedLight(msg);
                                 } else if (this.light === "Green") {
                                     this.GreenLight(msg);
@@ -192,7 +192,7 @@ class RGLGame {
                     let topwinners = participantsArray.slice(0, winnersC).map(([id, count]) => ({ id, count }));
 
                     topwinners.forEach(async ({ id, count }, index) => {
-                        EmbedWin.addFields({ name: " ", value: `${medals[index]} : <@${id}> | points : ${count}` });
+                        EmbedWin.addFields({ name: " ", value: `${medals[index]} : <@${id}> \`${count}\`` });
                         await saveRWinners(this.db, this.guildID, this.channelID, id);
                     });
 
@@ -204,7 +204,7 @@ class RGLGame {
                     const EmbedParti = new EmbedBuilder()
                         .setColor("Green").setTitle("🛡️ Survivors 🛡️");
 
-                    let partiMSG = participantsArray.slice(winnersC || 0).map((s, i) => `${i + 1} : <@${s[0]}> | points : ${s[1]}`).join("\n")
+                    let partiMSG = participantsArray.slice(winnersC || 0).map((s, i) => `${i + 1} <@${s[0]}> : \`${s[1]}\``).join("\n")
 
                     EmbedParti.addFields({ name: "", value: partiMSG });
 
@@ -218,7 +218,7 @@ class RGLGame {
                 const EmbedLoser = new EmbedBuilder()
                     .setColor("DarkButNotBlack").setTitle("🪦 Eliminated 🪦")
 
-                let losersArrayTXT = [...losers.entries()].map((s, i) => `${i + 1} : <@${s[0]}> | points : ${s[1]}`).join("\n")
+                let losersArrayTXT = [...losers.entries()].map((s, i) => `${i + 1} <@${s[0]}> : \`${s[1]}\``).join("\n")
                 EmbedLoser.addFields({ name: "", value: losersArrayTXT });
 
                 this.mg.channel.send({ embeds: [EmbedLoser] });
