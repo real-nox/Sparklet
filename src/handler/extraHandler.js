@@ -1,6 +1,5 @@
 const { config } = require("dotenv"); config({ quiet: true })
 const { green, yellow, red, blue, cyan, grey } = require("colors");
-const { WebhookClient, EmbedBuilder } = require("discord.js");
 
 function Print(message, type = "Green") {
     try {
@@ -21,22 +20,9 @@ function Print(message, type = "Green") {
     }
 }
 
-function ErrorLog(title, message) {
-    try {
-        const webURI = process.env.WEBURL;
-        const ERRwebhook = new WebhookClient({ url: webURI });
-
-        const ERRBED = new EmbedBuilder().setTitle(`${title}`).setDescription(`> ${message}`).setColor("Red");
-
-        ERRwebhook.send({ embeds: [ERRBED] });
-    } catch (err) {
-        Print("[ERROR] : " + err, "Red");
-    }
-}
-
 async function delay(time) {
     time = time*1000;
     return new Promise(reso => setTimeout(reso, time));
 }
 
-module.exports = { Print, ErrorLog, delay }
+module.exports = { Print, delay }

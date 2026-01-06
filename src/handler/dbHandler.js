@@ -1,7 +1,8 @@
 const { config } = require("dotenv");
 const { createConnection } = require("mysql2")
-const { ErrorLog, Print } = require("./extraHandler");
+const { Print } = require("./extraHandler");
 const { LoadRGL } = require("../data/RGLDB");
+const { ErrorLog } = require("./logsHanlder");
 config({ quiet: true });
 
 let DB = createConnection({
@@ -12,7 +13,7 @@ let DB = createConnection({
     password: process.env.password,
 });
 
-async function LoaddDB() {
+function LoaddDB() {
     try {
 
         DB.connect(function (err) {

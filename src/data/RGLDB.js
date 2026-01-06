@@ -1,4 +1,5 @@
-const { Print, ErrorLog } = require("../handler/extraHandler");
+const { Print } = require("../handler/extraHandler");
+const { ErrorLog } = require("../handler/logsHanlder");
 
 const RGL_games =
     `create table if not exists RGL_games(

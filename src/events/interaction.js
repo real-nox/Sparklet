@@ -1,5 +1,6 @@
 const { Client } = require("discord.js");
-const { ErrorLog, Print } = require("../handler/extraHandler");
+const { Print } = require("../handler/extraHandler");
+const { ErrorLog } = require("../handler/logsHanlder");
 
 module.exports = {
     name: "interactionCreate",

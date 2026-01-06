@@ -1,6 +1,6 @@
 const { config } = require("dotenv"); config({ quiet: true });
 const { REST, Routes } = require("discord.js");
-const { Print, ErrorLog } = require("./extraHandler");
+const { Print } = require("./extraHandler");
 const path = require("path");
 const fs = require("fs");
 
@@ -8,6 +8,7 @@ const cmds = [];
 const prefixs = [];
 
 const asciiTable = require("ascii-table");
+const { ErrorLog } = require("./logsHanlder");
 const cmdTable = new asciiTable("Commands");
 cmdTable.setHeading("Name", "Type", "Execute");
 

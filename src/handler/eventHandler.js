@@ -1,8 +1,9 @@
-const { Print, ErrorLog } = require("./extraHandler");
+const { Print } = require("./extraHandler");
 const path = require("path");
 const fs = require("fs");
 
 const asciiTable = require("ascii-table");
+const { ErrorLog } = require("./logsHanlder");
 let table = new asciiTable('Events');
 
 table.setHeading("Name", "Execute");

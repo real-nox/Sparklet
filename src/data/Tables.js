@@ -1,4 +1,4 @@
-const { Print, ErrorLog } = require("../handler/extraHandler")
+/*const { Print } = require("../handler/extraHandler")
 
 const EconomyTable = `
     create table ECO(
@@ -23,4 +23,4 @@ async function EconomyCreateT(DB) {
     }
 }
 
-module.exports = { EconomyCreateT }
+module.exports = { EconomyCreateT }*/

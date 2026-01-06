@@ -1,13 +1,16 @@
 const { EmbedBuilder } = require("discord.js");
 const RGLGame = require("../../classes/RGLFunction")
-const { getRGameOngoing } = require("../../data/RGLDB")
-const { DB } = require("../../handler/dbHandler")
+const { getRGameOngoing, deleteRGL } = require("../../data/RGLDB")
+const { DB } = require("../../handler/dbHandler");
+const { ErrorLog } = require("../../handler/logsHanlder");
+const { Print } = require("../../handler/extraHandler");
 
 let RGL;
 
 module.exports = {
     name: "rgl",
     async prerun(mg, client) {
+        try {
         const guildID = mg.guild.id;
         const channelID = mg.channel.id;
 
@@ -51,7 +54,10 @@ module.exports = {
                 }
 
                 mg.reply("## Ending Game!")
-                await RGL.GameStart(true);
+                if (RGL) 
+                    await RGL.GameStart(true);
+                else
+                    await deleteRGL(DB, guildID, channelID);
                 break;
 
             default:
@@ -59,5 +65,9 @@ module.exports = {
                 mg.reply({ embeds: [ErrEmbed] });;
                 break;
         }
+    } catch (error) {
+        Print("[RGL] " + error, "Red");
+        ErrorLog("RGL", error);
+    }
     }
 }
