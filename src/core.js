@@ -20,11 +20,11 @@ bot.commands = new Collection();
 bot.events = new Collection();
 bot.cooldowns = new Collection();
 
-bot.login(process.env.TOKEN).then(() => {
+bot.login(process.env.TOKEN).then(async () => {
     try {
         eventHandler(bot);
         commandHandler(bot);
-        LoaddDB();
+        await LoaddDB();
     } catch (err) {
         Print("[ERROR] " + err, "Red");
         ErrorLog("BOT Launch", err)

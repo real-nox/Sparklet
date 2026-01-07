@@ -20,10 +20,10 @@ const RGL_T =
 async function LoadRGL(DB) {
     try {
         await DB.promise().query(RGL_games).then((res) => {
-            if (!res) return print("[ERROR]");
+            if (!res) return Print("[RGLDB] " + err, "Red");
         });
         await DB.promise().query(RGL_T).then((res) => {
-            if (!res) return print("[ERROR]");
+            if (!res) return Print("[RGLDB] " + err, "Red");
         });
     } catch (err) {
         Print("[RGLDB] " + err, "Red");

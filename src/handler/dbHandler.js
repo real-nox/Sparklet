@@ -3,6 +3,7 @@ const { createConnection } = require("mysql2")
 const { Print } = require("./extraHandler");
 const { LoadRGL } = require("../data/RGLDB");
 const { ErrorLog } = require("./logsHanlder");
+const { LoadServer } = require("../data/ServerDB");
 config({ quiet: true });
 
 let DB = createConnection({
@@ -13,7 +14,7 @@ let DB = createConnection({
     password: process.env.password,
 });
 
-function LoaddDB() {
+async function LoaddDB() {
     try {
 
         DB.connect(function (err) {
@@ -21,7 +22,8 @@ function LoaddDB() {
             Print("[DATABASE] Connected to the MySQL database!", "Cyan")
         });
 
-        LoadRGL(DB)
+        await LoadRGL(DB)
+        await LoadServer(DB)
         return DB;
     } catch (error) {
         Print("[ERROR] " + error, "Red");
