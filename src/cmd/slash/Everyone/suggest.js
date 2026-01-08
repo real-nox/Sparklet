@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, MessageFlags } = require("discord.js");
-const { SuggestionLog, ErrorLog } = require("../../handler/logsHanlder");
-const { Print } = require("../../handler/extraHandler");
+const { SuggestionLog, ErrorLog } = require("../../../handler/logsHanlder");
+const { Print } = require("../../../handler/extraHandler");
 const { profanity } = require("@2toad/profanity");
 
 module.exports = {

@@ -1,14 +1,15 @@
 const { EmbedBuilder } = require("discord.js");
-const RGLGame = require("../../classes/RGLFunction")
-const { getRGameOngoing, deleteRGL } = require("../../data/RGLDB")
-const { DB } = require("../../handler/dbHandler");
-const { ErrorLog } = require("../../handler/logsHanlder");
-const { Print } = require("../../handler/extraHandler");
+const RGLGame = require("../../../classes/RGLFunction")
+const { getRGameOngoing, deleteRGL } = require("../../../data/RGLDB")
+const { DB } = require("../../../handler/dbHandler");
+const { ErrorLog } = require("../../../handler/logsHanlder");
+const { Print } = require("../../../handler/extraHandler");
 
 let RGL;
 
 module.exports = {
     name: "rgl",
+    staff : true,
     async prerun(mg, client) {
         try {
             const guildID = mg.guild.id;

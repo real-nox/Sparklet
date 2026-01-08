@@ -4,6 +4,7 @@ const { ErrorLog } = require("../handler/logsHanlder");
 const SERVERT =
     `create table if not exists serverT(
     guildID varchar(250) Primary key,
+    staffRID varchar(250) default null,
     prefix varchar(5) default '!' 
 )`;
 
@@ -75,11 +76,45 @@ async function setPrefix(DB, guildID, prefix) {
         );
 
         if (!Updated) return false;
-        return true
+        return true;
     } catch (err) {
         Print("[SERVERDB] " + err, "Red");
         ErrorLog("SERVERDB", err);
     }
 }
 
-module.exports = { LoadServer, setGuild, getGuild, getPrefix, setPrefix }
+//Staff
+async function getStaffR(DB, guildID) {
+    try {
+        await getGuild(DB, guildID)
+
+        let [result] = await DB.promise().query(
+            `select staffRID from serverT where guildID = ${guildID}`
+        );
+
+        if (!result) return false;
+        return result;
+    } catch (err) {
+        Print("[SERVERDB] " + err, "Red");
+        ErrorLog("SERVERDB", err);
+    }
+}
+
+async function setStaffR(DB, guildID, staffRID) {
+    try {
+        await getGuild(DB, guildID)
+
+        let [Updated] = await DB.promise().query(
+            `Update serverT set staffRID = ? where guildID = ?`,
+            [staffRID, guildID]
+        );
+
+        if (!Updated) return false;
+        return true;
+    } catch (err) {
+        Print("[SERVERDB] " + err, "Red");
+        ErrorLog("SERVERDB", err);
+    }
+}
+
+module.exports = { LoadServer, setGuild, getGuild, getPrefix, setPrefix, setStaffR, getStaffR }

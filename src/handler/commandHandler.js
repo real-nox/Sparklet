@@ -16,34 +16,54 @@ function commandHandler(client) {
     try {
         const CMDFolder = path.join(__dirname, "../cmd/slash");
         const PREFolder = path.join(__dirname, "../cmd/prefix");
-        const cmdFiles = fs.readdirSync(CMDFolder).filter((file) => file.endsWith(".js"));
-        const preFiles = fs.readdirSync(PREFolder).filter((file) => file.endsWith(".js"));
 
-        for (const file of cmdFiles) {
-            const filepath = path.join(CMDFolder, file);
-            const cmd = require(filepath);
+        const preFolders = fs.readdirSync(PREFolder)
+        const cmdFolders = fs.readdirSync(CMDFolder)
 
-            if ('data' in cmd && 'execute' in cmd) {
-                client.commands.set(cmd.data.name, cmd);
-                cmds.push(cmd.data.toJSON());
-                cmdTable.addRow(file, "Slash", "Loaded");
-            } else {
-                cmdTable.addRow(file, "Slash", "Unloaded");
+        for (const folder of cmdFolders) {
+            let cmdFiles = fs.readdirSync(path.join(__dirname, `../cmd/slash/${folder}`));
+            for (const file of cmdFiles) {
+                try {
+                    const filepath = path.join(`${CMDFolder}/${folder}`, file);
+
+                    const cmd = require(filepath);
+
+                    if ('data' in cmd && 'execute' in cmd) {
+                        client.commands.set(cmd.data.name, cmd);
+                        cmds.push(cmd.data.toJSON());
+                        cmdTable.addRow(file, "Slash", "Loaded");
+                    } else {
+                        cmdTable.addRow(file, "Slash", "Unloaded");
+                    }
+                } catch (error) {
+                    Print("[COMMANDS] " + error, "Red");
+                    ErrorLog("COMMANDS", error);
+                }
             }
         }
 
         client.application.commands.set(cmds);
 
-        for (const file of preFiles) {
-            const filepath = path.join(PREFolder, file);
-            const pre = require(filepath);
+        for (const folder of preFolders) {
 
-            if (pre.prerun || pre.name) {
-                client.prefixs.set(pre.name, pre);
-                prefixs.push(pre.name);
-                cmdTable.addRow(file, "Prefix", "Loaded");
-            } else {
-                cmdTable.addRow(file, "Prefix", "Unloaded");
+            let preFiles = fs.readdirSync(path.join(__dirname, `../cmd/prefix/${folder}`));
+            for (const file of preFiles) {
+                try {
+                    const filepath = path.join(`${PREFolder}/${folder}`, file);
+
+                    const pre = require(filepath);
+
+                    if (pre.prerun || pre.name) {
+                        client.prefixs.set(pre.name, pre);
+                        prefixs.push(pre.name);
+                        cmdTable.addRow(file, "Prefix", "Loaded");
+                    } else {
+                        cmdTable.addRow(file, "Prefix", "Unloaded");
+                    }
+                } catch (error) {
+                    Print("[COMMANDS] " + error, "Red");
+                    ErrorLog("COMMANDS", error);
+                }
             }
         }
 

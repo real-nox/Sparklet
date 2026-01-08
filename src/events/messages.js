@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { getPrefix } = require("../data/ServerDB");
+const { getPrefix, getStaffR } = require("../data/ServerDB");
 const { DB } = require("../handler/dbHandler");
 const { Print } = require("../handler/extraHandler");
 const { ErrorLog } = require("../handler/logsHanlder");
@@ -14,11 +14,7 @@ module.exports = {
             const data = await getPrefix(DB, mg.guild.id);
             const prefix = data?.[0]?.prefix || "!";
 
-            if (!mg.content.startsWith('!') && !mg.content.startsWith(prefix)) {
-                const notpre = new EmbedBuilder()
-                    .setDescription("Command usage is incorrect").setColor("Red")
-                return mg.reply({ embeds: [notpre] })
-            };
+            if (!mg.content.startsWith('!') && !mg.content.startsWith(prefix)) return;
 
             let len = prefix.length;
 
@@ -36,19 +32,31 @@ module.exports = {
                 let cooldownUntil = client.cooldowns.get(`${precmd.name}-${mg.author.id}`);
                 if (cooldownUntil && cooldownUntil > Date.now()) {
                     const coolembed = new EmbedBuilder()
-                        .setDescription(`Command is on cooldown for ${Math.ceil((cooldownUntil - Date.now()) / 1000)} secs`).setColor("Red")
-                    return mg.reply({ embeds: [coolembed] })
+                        .setDescription(`Command is on cooldown for ${Math.ceil((cooldownUntil - Date.now()) / 1000)} secs`).setColor("Red");
+                    return mg.reply({ embeds: [coolembed] });
                 }
 
                 client.cooldowns.set(`${precmd.name}-${mg.author.id}`, new Date().valueOf() + precmd.cooldown);
             }
 
-            //Staff
+            //Owner
+            if (precmd.owner)
+                if (mg.author.id != "432592303450882064") return;
+
+            //Admin
             if (precmd.admin)
                 if (!mg.member.permissions.has("Administrator")) {
                     const permbed = new EmbedBuilder()
-                        .setDescription("You're not an admin to use this command!").setColor("Red")
-                    return mg.reply({ embeds: [permbed] })
+                        .setDescription("```You are not an admin to use this command!```").setColor("Red");
+                    return mg.reply({ embeds: [permbed] });
+                }
+
+            //Staff
+            if (precmd.staff)
+                if (!mg.member.permissions.has("Administrator") && !mg.member.permissions.has("ManageMessages") && !mg.member.roles.cache.has((await getStaffR(DB, mg.guild.id))[0].staffRID || '0')) {
+                    const permbed = new EmbedBuilder()
+                        .setDescription("```You are not a staff to use this command!```").setColor("Red");
+                    return mg.reply({ embeds: [permbed] });
                 }
 
             precmd.prerun(mg, client);

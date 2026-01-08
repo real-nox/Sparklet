@@ -1,8 +1,8 @@
 const { EmbedBuilder } = require("discord.js")
-const { setPrefix, getPrefix } = require("../../data/ServerDB")
-const { DB } = require("../../handler/dbHandler")
-const { Print } = require("../../handler/extraHandler")
-const { ErrorLog } = require("../../handler/logsHanlder")
+const { setPrefix, getPrefix } = require("../../../data/ServerDB")
+const { DB } = require("../../../handler/dbHandler")
+const { Print } = require("../../../handler/extraHandler")
+const { ErrorLog } = require("../../../handler/logsHanlder")
 
 module.exports = {
     name: "prefix",
