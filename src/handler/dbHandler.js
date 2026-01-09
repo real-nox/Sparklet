@@ -4,6 +4,7 @@ const { Print } = require("./extraHandler");
 const { RGL_T, RGL_games } = require("../data/RGLDB");
 const { ErrorLog } = require("./logsHanlder");
 const { SERVERT } = require("../data/ServerDB");
+const { EconomyT } = require("../data/EconomyDB");
 config({ quiet: true });
 
 let DB = createConnection({
@@ -33,7 +34,10 @@ async function LoaddDB() {
 async function LoadTables(DB) {
     try {
         await DB.promise().query(SERVERT).then((res) => {
-            if (!res) Print("[RGLDB] " + err, "Red");
+            if (!res) Print("[ServerDB] " + err, "Red");
+        });
+        await DB.promise().query(EconomyT).then((res) => {
+            if (!res) Print("[EcoDB] " + err, "Red");
         });
         await DB.promise().query(RGL_games).then((res) => {
             if (!res) Print("[RGLDB] " + err, "Red");

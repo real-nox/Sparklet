@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, MessageFlags, EmbedBuilder } = require("discord.js");
 const { getStaffR, setStaffR } = require("../../../data/ServerDB");
 const { DB } = require("../../../handler/dbHandler");
+const { Print } = require("../../../handler/extraHandler");
+const { ErrorLog } = require("../../../handler/logsHanlder");
 
 module.exports = {
     admin: true,
@@ -15,28 +17,33 @@ module.exports = {
                 .setRequired(true)
         ),
     async execute(interaction) {
-        const guild = interaction.guild;
-        let roleId = interaction.options.getRole('role').id;
+        try {
+            const guild = interaction.guild;
+            let roleId = interaction.options.getRole('role').id;
 
-        if (!guild.roles.cache.has(roleId))
-            return interaction.reply({ content: "Unfound role", flags: MessageFlags.Ephemeral });
+            if (!guild.roles.cache.has(roleId))
+                return interaction.reply({ content: "Unfound role", flags: MessageFlags.Ephemeral });
 
-        let oldStaffR = await getStaffR(DB, guild.id);
-        let setStaff = await setStaffR(DB, guild.id, roleId);
+            let oldStaffR = await getStaffR(DB, guild.id);
+            let setStaff = await setStaffR(DB, guild.id, roleId);
 
-        if (!setStaff)
-            return interaction.reply({ content: "Something went wrong, please use this command later.", flags: MessageFlags.Ephemeral });
+            if (!setStaff)
+                return interaction.reply({ content: "Something went wrong, please use this command later.", flags: MessageFlags.Ephemeral });
 
-        const staffUpdateEmbed = new EmbedBuilder().setTimestamp().setFooter({ text: `${guild.name}` }).setColor("Aqua");
+            const staffUpdateEmbed = new EmbedBuilder().setTimestamp().setFooter({ text: `${guild.name}` }).setColor("Aqua");
 
-        if (!oldStaffR) {
-            staffUpdateEmbed.setDescription(`Staff has been set to <@&${setStaffR}>`);
-        } else if (oldStaffR[0].staffRID == roleId) {
-            staffUpdateEmbed.setDescription(`Cannot update role, it's already been updated with the same ID`).setColor("Red");
-        } else {
-            staffUpdateEmbed.setTitle("Staff update").setDescription(`- **Old staff role :** <@&${oldStaffR[0].staffRID}>\n- **New staff role :** <@&${roleId}>`);
+            if (!oldStaffR) {
+                staffUpdateEmbed.setDescription(`Staff has been set to <@&${setStaffR}>`);
+            } else if (oldStaffR[0].staffRID == roleId) {
+                staffUpdateEmbed.setDescription(`Cannot update role, it's already been updated with the same ID`).setColor("Red");
+            } else {
+                staffUpdateEmbed.setTitle("Staff update").setDescription(`- **Old staff role :** <@&${oldStaffR[0].staffRID}>\n- **New staff role :** <@&${roleId}>`);
+            }
+
+            await interaction.reply({ embeds: [staffUpdateEmbed] })
+        } catch (error) {
+            Print("[STAFFCHANGE] " + error, "Red");
+            ErrorLog("STAFFCHANGE", error);
         }
-
-        await interaction.reply({ embeds: [staffUpdateEmbed] })
     }
 }
