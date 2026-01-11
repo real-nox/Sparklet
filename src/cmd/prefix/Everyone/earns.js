@@ -6,6 +6,7 @@ const { ErrorLog } = require("../../../handler/logsHanlder");
 
 module.exports = {
     name: "earns",
+    cooldown: 2000,
     async prerun(mg) {
         try {
             let userID = mg.author.id;
@@ -13,13 +14,11 @@ module.exports = {
 
             let addedS
             let userECO = await getBalC(DB, userID, guildID);
-            let cooldown = 30000;
+            let cooldown = 60000 + Date.now();
             let balance = 50;
 
-            const cooldownEnd = Date.now() + cooldown;
-
             if (!userECO) {
-                addedS = await Earns(DB, userID, guildID, balance, cooldownEnd, false);
+                addedS = await Earns(DB, userID, guildID, balance, cooldown, false);
                 if (addedS)
                     return mg.reply(`Added ${balance} sparks to your balance!`);
             }
@@ -45,7 +44,7 @@ module.exports = {
             }
 
             userECO.balance += balance;
-            addedS = await Earns(DB, userID, guildID, userECO.balance, cooldownEnd, true);
+            addedS = await Earns(DB, userID, guildID, userECO.balance, cooldown, true);
 
             if (addedS) {
                 return mg.reply(`Added ${balance} sparks to your balance!`);

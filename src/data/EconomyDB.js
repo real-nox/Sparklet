@@ -7,6 +7,7 @@ const EconomyT = `create table if not exists EconomyT(
     balance int default 0,
     earnc bigint,
     dailyc bigint,
+    coinfc bigint,
     primary key (userID, guildID)
 )`;
 
@@ -14,7 +15,7 @@ const EconomyT = `create table if not exists EconomyT(
 async function getBalC(DB, userID, guildID) {
     try {
         let [res] = await DB.promise().query(
-            `select balance, earnc, dailyc from economyT where userid = ? and guildid = ?`,
+            `select balance, earnc, dailyc, coinfc from economyT where userid = ? and guildid = ?`,
             [userID, guildID]
         );
 
@@ -26,9 +27,10 @@ async function getBalC(DB, userID, guildID) {
             balance = 0,
             earnc = 0,
             dailyc = 0,
+            coinfc = 0
         } = res[0];
 
-        return { balance, earnc, dailyc };
+        return { balance, earnc, dailyc, coinfc };
     } catch (error) {
         Print("[Getbal]", error, "Red");
         ErrorLog("Getbal", error);
@@ -80,4 +82,19 @@ async function Dailys(DB, userID, guildID, bal, cooldown, found) {
     }
 }
 
-module.exports = { EconomyT, getBalC, Earns, Dailys }
+//CF sparks
+async function Coinflips(DB, userID, guildID, bal, cooldown) {
+    try {
+        let res;
+
+        return [res] = await DB.promise().query(
+            `update economyt set balance = ?, coinfc = ? where (userid = ? and guildid = ?)`,
+            [bal, cooldown, userID, guildID]
+        );
+    } catch (error) {
+        Print("[CFDB] " + error, "Red");
+        ErrorLog("CFDB", error);
+    }
+}
+
+module.exports = { EconomyT, getBalC, Earns, Dailys, Coinflips }

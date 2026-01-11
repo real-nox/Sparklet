@@ -6,6 +6,7 @@ const { ErrorLog } = require("../../../handler/logsHanlder");
 
 module.exports = {
     name: "dailys",
+    cooldown : 2000,
     async prerun(mg) {
         try {
             let userID = mg.author.id;
