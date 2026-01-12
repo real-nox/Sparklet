@@ -1,8 +1,7 @@
 const { EmbedBuilder, TimestampStyles, time } = require("discord.js");
-const { getBalC, Coinflips } = require("../../../data/EconomyDB");
-const { DB } = require("../../../handler/dbHandler");
-const { Print } = require("../../../handler/extraHandler");
+const { EcoC, getBalC, Coinflips } = require("../../../data/EconomyDB");
 const { ErrorLog } = require("../../../handler/logsHanlder");
+const { Print } = require("../../../handler/extraHandler");
 
 module.exports = {
     name: "coinflip",
@@ -19,7 +18,7 @@ module.exports = {
             if (!price)
                 return mg.reply("Set your price between 50 and 2000 sparks");
 
-            let userECO = await getBalC(DB, userID, guildID);
+            let userECO = await getBalC(EcoC, userID, guildID);
 
             if (!userECO)
                 return mg.reply("you have nothing..");
@@ -63,7 +62,7 @@ module.exports = {
                 cfembed.setColor("DarkRed");
 
             }
-            let res = await Coinflips(DB, userID, guildID, bal, cooldown)
+            let res = await Coinflips(EcoC, userID, guildID, bal, cooldown)
 
             if (res)
                 cfembed.setDescription(`${des}`)

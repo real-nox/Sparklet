@@ -4,7 +4,7 @@ const { config } = require("dotenv"); config({ quiet: true });
 const { eventHandler } = require("./handler/eventHandler");
 const { ErrorLog } = require("./handler/logsHanlder");
 const { Print } = require("./handler/extraHandler");
-const { LoaddDB } = require("./handler/dbHandler");
+const { LoadDB } = require("./handler/dbHandler");
 
 let bot = new Client({
     intents: [
@@ -25,7 +25,7 @@ bot.login(process.env.TOKEN).then(async () => {
     try {
         eventHandler(bot);
         commandHandler(bot);
-        await LoaddDB();
+        await LoadDB();
     } catch (err) {
         Print("[ERROR] " + err, "Red");
         ErrorLog("BOT Launch", err)

@@ -1,9 +1,8 @@
-const { EmbedBuilder } = require("discord.js");
-const RGLGame = require("../../../classes/RGLFunction")
-const { getRGameOngoing, deleteRGL } = require("../../../data/RGLDB")
-const { DB } = require("../../../handler/dbHandler");
+const { getRGameOngoing, deleteRGL, RGLGames } = require("../../../data/RGLDB");
 const { ErrorLog } = require("../../../handler/logsHanlder");
 const { Print } = require("../../../handler/extraHandler");
+const RGLGame = require("../../../classes/RGLFunction");
+const { EmbedBuilder } = require("discord.js");
 
 let RGL;
 
@@ -27,7 +26,7 @@ module.exports = {
 
             cmdType = cmdType.includes("-", 0) ? cmdType = cmdType.slice(1) : cmdType;
 
-            let Game = await getRGameOngoing(DB, guildID, channelID);
+            let Game = await getRGameOngoing(RGLGames, guildID, channelID);
 
             switch (cmdType) {
                 case "start":
@@ -43,7 +42,7 @@ module.exports = {
                         return mg.reply({ embeds: [ErrEmbed] });
                     }
 
-                    RGL = new RGLGame(client, mg, DB, rounds, time, winnersC);
+                    RGL = new RGLGame(client, mg, rounds, time, winnersC);
                     await RGL.Starter();
                     break;
 
@@ -58,7 +57,7 @@ module.exports = {
                     if (RGL)
                         await RGL.GameStart(true);
                     else
-                        await deleteRGL(DB, guildID, channelID);
+                        await deleteRGL(RGLGames, guildID, channelID);
                     break;
 
                 default:

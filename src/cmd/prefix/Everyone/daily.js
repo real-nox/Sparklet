@@ -1,24 +1,26 @@
 const { time, TimestampStyles } = require("discord.js");
-const { getBalC, Dailys } = require("../../../data/EconomyDB");
-const { DB } = require("../../../handler/dbHandler");
+const { EcoC, getBalC, Dailys } = require("../../../data/EconomyDB");
 const { Print } = require("../../../handler/extraHandler");
 const { ErrorLog } = require("../../../handler/logsHanlder");
 
 module.exports = {
     name: "dailys",
-    cooldown : 2000,
+    cooldown: 2000,
     async prerun(mg) {
         try {
             let userID = mg.author.id;
             let guildID = mg.guild.id;
 
-            let userECO = await getBalC(DB, userID, guildID);
+            let addedS;
+            let userECO = await getBalC(EcoC, userID, guildID);
             let cooldown24h = 86400 * 1000 + Date.now();
 
             let bal = 100
 
             if (!userECO) {
-                await Dailys(DB, userID, guildID, bal, cooldown24h, false);
+                addedS = await Dailys(EcoC, userID, guildID, bal, cooldown24h, false);
+                if (addedS)
+                    return mg.reply(`Added ${bal} sparks to your balance!`);
             }
 
             if (userECO.balance === 100000) {
@@ -42,9 +44,9 @@ module.exports = {
             }
 
             userECO.balance += bal;
-            let [res] = await Dailys(DB, userID, guildID, userECO.balance, cooldown24h, true)
+            addedS = await Dailys(EcoC, userID, guildID, userECO.balance, cooldown24h, true)
 
-            if (res) {
+            if (addedS) {
                 return mg.reply(`Daily : ${bal} has been added to your balance`);
             }
         } catch (error) {

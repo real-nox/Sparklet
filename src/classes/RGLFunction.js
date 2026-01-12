@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { gameRStart, saveRWinners, gameREnd, deleteRGL } = require("../data/RGLDB");
+const { gameRStart, saveRWinners, gameREnd, deleteRGL, RGLGames, RGLC } = require("../data/RGLDB");
 const { delay, Print } = require("../handler/extraHandler");
 const { ErrorLog, EventLog } = require("../handler/logsHanlder");
 
@@ -17,10 +17,9 @@ let listener;
 
 class RGLGame {
 
-    constructor(client, mg, DB, rounds, time, winnersC) {
+    constructor(client, mg, rounds, time, winnersC) {
         this.guildID = mg.guild.id;
         this.channelID = mg.channel.id;
-        this.db = DB;
         this.mg = mg;
 
         this.client = client;
@@ -40,7 +39,7 @@ class RGLGame {
 
     async Starter() {
         try {
-            const started = await gameRStart(this.db, this.guildID, this.channelID);
+            const started = await gameRStart(RGLGames, this.guildID, this.channelID);
 
             const ErrEmbed = new EmbedBuilder().setColor("Red");
 
@@ -128,6 +127,7 @@ class RGLGame {
                     this.list = false;
                     if (listener) this.client.off("messageCreate", listener);
                     await this.WinnersLight();
+                    delay(2);
                     this.gameon = false;
                     return await this.GameEnd();
                 }
@@ -173,7 +173,7 @@ class RGLGame {
         try {
             if (!this.list) {
                 if (participants.size === 0 && losers.size === 0) {
-                    await deleteRGL(this.db, this.guildID, this.channelID)
+                    await deleteRGL(RGLGames, this.guildID, this.channelID)
                     return this.mg.channel.send("## 😞 No one participated!");
                 }
             }
@@ -193,7 +193,7 @@ class RGLGame {
 
                     topwinners.forEach(async ({ id, count }, index) => {
                         EmbedWin.addFields({ name: " ", value: `${medals[index]} : <@${id}> \`${count}\`` });
-                        await saveRWinners(this.db, this.guildID, this.channelID, id);
+                        await saveRWinners(RGLC, this.guildID, this.channelID, id);
                     });
 
                     for (const { id } of topwinners) participants.delete(id);
@@ -232,7 +232,7 @@ class RGLGame {
 
     async GameEnd() {
         try {
-            await gameREnd(this.db, this.guildID, this.channelID);
+            await gameREnd(RGLGames, this.guildID, this.channelID);
 
             if (losers.size > 0) losers.clear();
             if (participants.size > 0 ) participants.clear();

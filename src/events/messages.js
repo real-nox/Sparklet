@@ -1,8 +1,7 @@
-const { EmbedBuilder } = require("discord.js");
-const { getPrefix, getStaffR } = require("../data/ServerDB");
-const { DB } = require("../handler/dbHandler");
-const { Print } = require("../handler/extraHandler");
+const { getPrefix, getStaffR, ServerC } = require("../data/ServerDB");
 const { ErrorLog } = require("../handler/logsHanlder");
+const { Print } = require("../handler/extraHandler");
+const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
     name: "messageCreate",
@@ -11,8 +10,8 @@ module.exports = {
             if (mg.author.bot) return;
             if (!mg.guild) return;
 
-            const data = await getPrefix(DB, mg.guild.id);
-            const prefix = data?.[0]?.prefix || "!";
+            const data = await getPrefix(ServerC, mg.guild.id);
+            const prefix = data?.prefix || "!";
 
             if (!mg.content.startsWith('!') && !mg.content.startsWith(prefix)) return;
 
@@ -53,7 +52,7 @@ module.exports = {
 
             //Staff
             if (precmd.staff)
-                if (!mg.member.permissions.has("Administrator") && !mg.member.permissions.has("ManageMessages") && !mg.member.roles.cache.has((await getStaffR(DB, mg.guild.id))[0].staffRID || '0')) {
+                if (!mg.member.permissions.has("Administrator") && !mg.member.permissions.has("ManageMessages") && !mg.member.roles.cache.has((await getStaffR(ServerC, mg.guild.id)).staffRID || '0')) {
                     const permbed = new EmbedBuilder()
                         .setDescription("```You are not a staff to use this command!```").setColor("Red");
                     return mg.reply({ embeds: [permbed] });

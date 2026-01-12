@@ -1,13 +1,54 @@
-const { config } = require("dotenv");
-const { createConnection } = require("mysql2")
-const { Print } = require("./extraHandler");
-const { RGL_T, RGL_games } = require("../data/RGLDB");
+const { config } = require("dotenv"); config({ quiet: true });
 const { ErrorLog } = require("./logsHanlder");
-const { SERVERT } = require("../data/ServerDB");
-const { EconomyT } = require("../data/EconomyDB");
-config({ quiet: true });
+const { Print } = require("./extraHandler");
+const mongoose = require("mongoose");
 
-let DB = createConnection({
+async function LoadDB() {
+    let res;
+    await mongoose.connect(process.env.uri)
+        .then(() => {
+            Print("[DATABASE] Connected to the MongoDB database!", "Cyan");
+            res = true;
+        })
+        .catch((error) => {
+            Print("[ERROR] " + error, "Red");
+            res = false;
+        })
+
+    if (!res)
+        return await LoadDB();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*let DB = createConnection({
     host: process.env.host,
     user: process.env.user,
     port: process.env.port,
@@ -49,6 +90,6 @@ async function LoadTables(DB) {
         Print("[RGLDB] " + err, "Red");
         ErrorLog("RGLDB", err);
     }
-}
+}*/
 
-module.exports = { LoaddDB, DB }
+module.exports = { LoadDB }

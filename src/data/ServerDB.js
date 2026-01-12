@@ -1,34 +1,44 @@
-const { Print } = require("../handler/extraHandler");
 const { ErrorLog } = require("../handler/logsHanlder");
+const { Print } = require("../handler/extraHandler");
+const { Schema, model } = require("mongoose");
 
-const SERVERT =
-    `create table if not exists serverT(
-    guildID varchar(250) Primary key,
-    staffRID varchar(250) default null,
-    prefix varchar(5) default '!' 
-)`;
+const ServerSc = new Schema(
+    {
+        guildID: {
+            type: String,
+            required: true
+        },
+        staffRID: {
+            type: String,
+            required: false
+        },
+        prefix: {
+            type: String,
+            required: false,
+            default: '!'
+        }
+    }
+);
 
-async function setGuild(DB, guildID) {
+let ServerC = model("ServerC", ServerSc);
+
+async function setGuild(DB, guildId) {
     try {
-        let [res] = await DB.promise().query(
-            `insert into serverT (guildID) values (?)`, [guildID]
-        );
+        let res = await DB.create({ guildID: guildId });
 
-        if (res) return true;
-        return false;
+        if (!res) return false;
+        return true;
     } catch (err) {
         Print("[SERVERDB] " + err, "Red");
         ErrorLog("SERVERDB", err);
     }
 }
 
-async function getGuild(DB, guildID) {
+async function getGuild(DB, guildId) {
     try {
-        let [res] = await DB.promise().query(
-            `select * from serverT where guildID = ${guildID}`
-        );
-        
-        if(!res) return false
+        let res = await DB.findOne({ guildID: guildId });
+
+        if (!res) return false
         return res;
     } catch (err) {
         Print("[SERVERDB] " + err, "Red");
@@ -37,33 +47,32 @@ async function getGuild(DB, guildID) {
 }
 
 //Prefix change
-async function getPrefix(DB, guildID) {
+async function getPrefix(DB, guildId) {
     try {
-        await getGuild(DB, guildID)
+        await getGuild(DB, guildId)
 
-        let [result] = await DB.promise().query(
-            `select prefix from serverT where guildID = ${guildID}`
-        );
+        let result = await DB.findOne(({ guildID: guildId }));
 
         if (!result) return false;
-        return result;
+        return result.prefix;
     } catch (err) {
         Print("[SERVERDB] " + err, "Red");
         ErrorLog("SERVERDB", err);
     }
 }
 
-async function setPrefix(DB, guildID, prefix) {
+async function setPrefix(DB, guildId, prefix, found) {
     try {
-        await getGuild(DB, guildID)
+        await getGuild(DB, guildId)
 
-        let [Updated] = await DB.promise().query(
-            `Update serverT set prefix = ? where guildID = ?`,
-            [prefix, guildID]
-        );
+        if (!found)
+            return await DB.create({ guildID: guildId, prefix: prefix });
+        else {
+            let Updated = await DB.updateOne({ guildID: guildId }, { $set: { prefix: prefix } });
 
-        if (!Updated) return false;
-        return true;
+            if (!Updated) return false;
+            return true;
+        }
     } catch (err) {
         Print("[SERVERDB] " + err, "Red");
         ErrorLog("SERVERDB", err);
@@ -71,13 +80,11 @@ async function setPrefix(DB, guildID, prefix) {
 }
 
 //Staff
-async function getStaffR(DB, guildID) {
+async function getStaffR(DB, guildId) {
     try {
-        await getGuild(DB, guildID)
+        await getGuild(DB, guildId);
 
-        let [result] = await DB.promise().query(
-            `select staffRID from serverT where guildID = ${guildID}`
-        );
+        let result = await DB.findOne({ guildID: guildId });
 
         if (!result) return false;
         return result;
@@ -87,14 +94,11 @@ async function getStaffR(DB, guildID) {
     }
 }
 
-async function setStaffR(DB, guildID, staffRID) {
+async function setStaffR(DB, guildId, staffRID) {
     try {
-        await getGuild(DB, guildID)
-
-        let [Updated] = await DB.promise().query(
-            `Update serverT set staffRID = ? where guildID = ?`,
-            [staffRID, guildID]
-        );
+        await getGuild(DB, guildId);
+        
+        let Updated = await DB.updateOne({ guildID: guildId }, { $set: { staffRID: staffRID } });
 
         if (!Updated) return false;
         return true;
@@ -104,4 +108,4 @@ async function setStaffR(DB, guildID, staffRID) {
     }
 }
 
-module.exports = { SERVERT, setGuild, getGuild, getPrefix, setPrefix, setStaffR, getStaffR }
+module.exports = { ServerC, setGuild, getGuild, getPrefix, setPrefix, setStaffR, getStaffR }

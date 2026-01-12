@@ -1,34 +1,51 @@
-const { Print } = require("../handler/extraHandler");
 const { ErrorLog } = require("../handler/logsHanlder");
+const { Print } = require("../handler/extraHandler");
+const { Schema, model } = require("mongoose");
 
-const EconomyT = `create table if not exists EconomyT(
-    userID varchar(250),
-    guildID varchar(250),
-    balance int default 0,
-    earnc bigint,
-    dailyc bigint,
-    coinfc bigint,
-    primary key (userID, guildID)
-)`;
-
-//Balance
-async function getBalC(DB, userID, guildID) {
-    try {
-        let [res] = await DB.promise().query(
-            `select balance, earnc, dailyc, coinfc from economyT where userid = ? and guildid = ?`,
-            [userID, guildID]
-        );
-
-        if (!res || res.length === 0) {
-            return false;
+const EconomySchema = new Schema(
+    {
+        userID: {
+            type: String,
+            required: true
+        },
+        guildID: {
+            type: String,
+            required: true
+        },
+        balance: {
+            type: Number,
+            required: false
+        },
+        earnc: {
+            type: Number,
+            required: false
+        },
+        dailyc: {
+            type: Number,
+            required: false
+        },
+        coinfc: {
+            type: Number,
+            required: false
         }
+    }
+);
+
+let EcoC = model("eco", EconomySchema);
+
+async function getBalC(DB, userId, guildId) {
+    try {
+        let data = await DB.findOne({ userID: userId, guildID: guildId })
+
+        if (!data || !data.balance)
+            return false;
 
         const {
             balance = 0,
             earnc = 0,
             dailyc = 0,
             coinfc = 0
-        } = res[0];
+        } = data;
 
         return { balance, earnc, dailyc, coinfc };
     } catch (error) {
@@ -38,22 +55,13 @@ async function getBalC(DB, userID, guildID) {
 }
 
 //Earn Sparks
-async function Earns(DB, userID, guildID, bal, cooldown, found) {
+async function Earns(DB, userId, guildId, bal, cooldown, found) {
     try {
-        let res;
 
-        if (!found) {
-            return [res] = await DB.promise().query(
-                `insert into economyt (userid, guildid, balance, earnc) values (?,?,?,?)`,
-                [userID, guildID, bal, cooldown]
-            );
-        };
+        if (!found)
+            return await DB.create({ userID: userId, guildID: guildId, balance: bal, earnc: cooldown });
 
-        return [res] = await DB.promise().query(
-            `update economyt set balance = ?, earnc = ? where (userid = ? and guildid = ?)`,
-            [bal, cooldown, userID, guildID]
-        );
-
+        return await DB.updateOne({ userID: userId, guildID: guildId }, { $set: { balance: bal, earnc: cooldown } });
     } catch (error) {
         Print("[EARNCDB] " + error, "Red");
         ErrorLog("EARNCDB", error);
@@ -61,21 +69,12 @@ async function Earns(DB, userID, guildID, bal, cooldown, found) {
 }
 
 //Daily Sparks
-async function Dailys(DB, userID, guildID, bal, cooldown, found) {
+async function Dailys(DB, userId, guildId, bal, cooldown, found) {
     try {
-        let res;
+        if (!found)
+            return await DB.create({ userID: userId, guildID: guildId, balance: bal, dailyc: cooldown });
 
-        if (!found) {
-            return [res] = await DB.promise().query(
-                `insert into EconomyT (userid, guildid, balance, dailyc) values (?,?,?,?)`,
-                [userID, guildID, bal, cooldown]
-            );
-        }
-
-        return [res] = await DB.promise().query(
-            `update economyT set balance = ?, dailyc = ? where (userID = ? and guildid = ?)`,
-            [bal, cooldown, userID, guildID]
-        );
+        return await DB.updateOne({ userID: userId, guildID: guildId }, { $set: { balance: bal, dailyc: cooldown } });
     } catch (error) {
         Print("[DAILYSDB] " + error, "Red");
         ErrorLog("DAILYSDB", error);
@@ -83,18 +82,13 @@ async function Dailys(DB, userID, guildID, bal, cooldown, found) {
 }
 
 //CF sparks
-async function Coinflips(DB, userID, guildID, bal, cooldown) {
+async function Coinflips(DB, userId, guildId, bal, cooldown) {
     try {
-        let res;
-
-        return [res] = await DB.promise().query(
-            `update economyt set balance = ?, coinfc = ? where (userid = ? and guildid = ?)`,
-            [bal, cooldown, userID, guildID]
-        );
+        return await DB.updateOne({ userID: userId, guildID: guildId }, { $set: { balance: bal, coinfc: cooldown } });
     } catch (error) {
         Print("[CFDB] " + error, "Red");
         ErrorLog("CFDB", error);
     }
 }
 
-module.exports = { EconomyT, getBalC, Earns, Dailys, Coinflips }
+module.exports = { EcoC, getBalC, Earns, Dailys, Coinflips };

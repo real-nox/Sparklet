@@ -1,6 +1,5 @@
 const { time, TimestampStyles } = require("discord.js");
-const { getBalC, Earns } = require("../../../data/EconomyDB");
-const { DB } = require("../../../handler/dbHandler");
+const { EcoC, getBalC, Earns } = require("../../../data/EconomyDB");
 const { Print } = require("../../../handler/extraHandler");
 const { ErrorLog } = require("../../../handler/logsHanlder");
 
@@ -12,13 +11,13 @@ module.exports = {
             let userID = mg.author.id;
             let guildID = mg.guild.id;
 
-            let addedS
-            let userECO = await getBalC(DB, userID, guildID);
+            let addedS;
+            let userECO = await getBalC(EcoC, userID, guildID);
             let cooldown = 60000 + Date.now();
             let balance = 50;
 
             if (!userECO) {
-                addedS = await Earns(DB, userID, guildID, balance, cooldown, false);
+                addedS = await Earns(EcoC, userID, guildID, balance, cooldown, false);
                 if (addedS)
                     return mg.reply(`Added ${balance} sparks to your balance!`);
             }
@@ -44,7 +43,8 @@ module.exports = {
             }
 
             userECO.balance += balance;
-            addedS = await Earns(DB, userID, guildID, userECO.balance, cooldown, true);
+            console.log(userECO.balance)
+            addedS = await Earns(EcoC, userID, guildID, userECO.balance, cooldown, true);
 
             if (addedS) {
                 return mg.reply(`Added ${balance} sparks to your balance!`);

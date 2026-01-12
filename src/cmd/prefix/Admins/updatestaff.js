@@ -1,6 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { getStaffR, setStaffR } = require("../../../data/ServerDB");
-const { DB } = require("../../../handler/dbHandler");
+const { ServerC, getStaffR, setStaffR } = require("../../../data/ServerDB");
 const { Print } = require("../../../handler/extraHandler");
 const { ErrorLog } = require("../../../handler/logsHanlder");
 
@@ -16,8 +15,8 @@ module.exports = {
             if (!guild.roles.cache.has(roleID))
                 return mg.reply("Unfound role");
 
-            let oldStaffR = await getStaffR(DB, guild.id);
-            let setStaff = await setStaffR(DB, guild.id, roleID);
+            let oldStaffR = await getStaffR(ServerC, guild.id);
+            let setStaff = await setStaffR(ServerC, guild.id, roleID);
 
             if (!setStaff)
                 return mg.reply("Something went wrong, please use this command later.");

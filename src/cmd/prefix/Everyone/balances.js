@@ -1,5 +1,4 @@
-const { getBalC } = require("../../../data/EconomyDB");
-const { DB } = require("../../../handler/dbHandler");
+const { getBalC, EcoC } = require("../../../data/EconomyDB");
 
 module.exports = {
     name: "bal",
@@ -8,7 +7,7 @@ module.exports = {
             let userID = mg.author.id;
             let guildID = mg.guild.id;
 
-            let { balance } = await getBalC(DB, userID, guildID);
+            let { balance } = await getBalC(EcoC, userID, guildID);
 
             return mg.reply(`You have ${balance}`);
         } catch (error) {
