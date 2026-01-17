@@ -93,10 +93,10 @@ class TicketSystem {
             //Assumming that user have never opened the ticket
             const ticketSInfo = await getTCol(TicketS, this.guild.id);
 
-            const categoryT = await this.interaction.guild.channels.cache.find(c => c.id === ticketSInfo.categoryId);
+            let categoryT = await this.interaction.guild.channels.cache.find(c => c.id === ticketSInfo.categoryId);
 
             if (!categoryT) {
-
+                categoryT = await this.interaction.guild.channels.create({ name: "Tickets", type: ChannelType.GuildCategory })
             }
 
             await this.interaction.deferReply({ flags: MessageFlags.Ephemeral });
@@ -122,19 +122,62 @@ class TicketSystem {
             })
 
             await this.interaction.editReply({ content: `Ticket channel created ${TicketChannelU}`, flags: MessageFlags.Ephemeral })
-            await TicketChannelU.send(`${this.interaction.member}`)
+
+            const ticketembed = new EmbedBuilder()
+                .setDescription("Welcome to this ticket!")
+                .setFooter({ text: await this.interaction.client.user.username });
+
+            const closeBtn = new ButtonBuilder()
+                .setCustomId(`closeT-${await TicketChannelU.id}-${await this.interaction.member.user.id}`)
+                .setEmoji("🔒")
+                .setLabel("Close")
+                .setStyle(ButtonStyle.Danger)
+
+            const claimBtn = new ButtonBuilder()
+                .setCustomId(`claimT-${await TicketChannelU.id}-${await this.interaction.member.user.id}`)
+                .setEmoji("📫")
+                .setLabel("Claim")
+                .setStyle(ButtonStyle.Primary)
+
+            const row = new ActionRowBuilder().addComponents(closeBtn, claimBtn)
+
+            await TicketChannelU.send({ content: `${await this.interaction.member}`, embeds: [ticketembed], components: [row] })
         } catch (error) {
             Print("[TICKETOpenC] " + error, "Red");
             ErrorLog("TICKETOpenC", error);
         }
     }
 
-    closeT() {
+    async closeT() {
+        try {
+            await this.interaction.reply("Closing")
+            
 
+        } catch (error) {
+            Print("[CLOSET] " + error, "Red");
+            ErrorLog("CLOSET", error);
+        }
     }
 
-    transcriptT() {
+    async reopenT() {
+        try { } catch (error) {
+            Print("[REOPENT] " + error, "Red");
+            ErrorLog("REOPENT", error);
+        }
+    }
 
+    async deleteT() {
+        try { } catch (error) {
+            Print("[DELETET] " + error, "Red");
+            ErrorLog("DELETET", error);
+        }
+    }
+
+    async transcriptT() {
+        try { } catch (error) {
+            Print("[TRANSCRIPTIONT] " + error, "Red");
+            ErrorLog("TRANSCRIPTIONT", error);
+        }
     }
 }
 

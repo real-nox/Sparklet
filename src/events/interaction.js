@@ -57,6 +57,13 @@ module.exports = {
                     const TicketC = new TicketSystem(interaction, client);
                     await TicketC.openT();
                 }
+
+                if (interaction.customId === `closeT-${interaction.channel.id}-${interaction.member.user.id}`) {
+                    const TicketC = new TicketSystem(interaction, client);
+                    //await interaction.message.edit({content : "hello"})
+                    await TicketC.closeT();
+                }
+
             }
         } catch (error) {
             Print("[ERROR] " + error, "Red");
