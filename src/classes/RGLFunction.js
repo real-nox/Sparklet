@@ -3,21 +3,9 @@ const { gameRStart, saveRWinners, gameREnd, deleteRGL, RGLGames, RGLC } = requir
 const { delay, Print } = require("../handler/extraHandler");
 const { ErrorLog, EventLog } = require("../handler/logsHanlder");
 
-let current = (Math.random() < 0.5) ? "Red" : "Green";
-
-function NEXTLight() {
-    return current = current === "Red" ? "Green" : "Red";
-}
-
-let participants = new Map();
-let losers = new Map();
-
-let i = 0;
-let listener;
-
 class RGLGame {
 
-    constructor(client, mg, rounds, time, winnersC) {
+    constructor(client, mg, RGLConfig) {
         this.guildID = mg.guild.id;
         this.channelID = mg.channel.id;
         this.mg = mg;
@@ -25,16 +13,25 @@ class RGLGame {
         this.client = client;
 
         //Game Settings
-        this.rounds = rounds;
-
-        this.time = time;
+        this.rounds = RGLConfig.rounds;
+        this.time = RGLConfig.time;
         this.timerRed;
         this.timerGreen;
 
-        this.winnerC = winnersC ? winnersC : 3
+        this.current = Math.random() < 0.5 ? "Red" : "Green";
+
+        this.winnerC = RGLConfig.winnersC ? RGLConfig.winnersC : 3
         this.light;
         this.gameon = false;
         this.list = true;
+
+        this.i = 0;
+        //Setting up teams
+        this.participants = new Map();
+        this.losers = new Map();
+
+        this.listener = null;
+        this.handlermsg = null;
     }
 
     async Starter() {
@@ -64,88 +61,99 @@ class RGLGame {
 
     async GameStart(stop = false) {
         try {
+            if (!this.gameon) return;
 
-            if (this.gameon == true) {
+            this.MessageHandler();
+            await delay(1);
+            await this.rounds();
 
-                if (!stop) {
-                    listener = async (msg) => {
-                        if (msg.channel.id === this.channelID) {
-                            if (msg.author.bot) return;
-
-                            if (!(msg.content.includes("rgl -end") && this.mg.author == msg.author)) {
-                                if (this.light === "Red") {
-                                    msg.react("🪦");
-                                    this.RedLight(msg);
-                                } else if (this.light === "Green") {
-                                    this.GreenLight(msg);
-                                }
-                            }
-                        }
-                    }
-
-                    this.client.on("messageCreate", listener);
-
-                    for (i = 1; i <= this.rounds; i++) {
-
-                        this.light = NEXTLight();
-                        this.mg.channel.send(`## Round ${i}\n- Everyone can join!`);
-
-                        await delay(1)
-                        if (this.light == "Red") {
-                            this.mg.channel.send({
-                                embeds:
-                                    [new EmbedBuilder().setTitle("RED LIGHT").setDescription("🔴 Red Light! Don't TALK or you'll be eliminated!!")]
-                            });
-                            
-                            this.timerRed = Math.floor(Math.random() * this.time) + 3;
-                            await delay(this.timerRed);
-
-                            if (i < this.rounds) {
-                                await this.WinnersLight();
-                                await delay(1);
-                            }
-                        } else {
-                            this.mg.channel.send({
-                                embeds:
-                                    [new EmbedBuilder().setTitle("GREEN LIGHT").setDescription("🟢 Green Light! TALK to win.")]
-                            });
-
-                            this.timerGreen = Math.floor(Math.random() * this.time) + 5;
-                            await delay(this.timerGreen);
-
-                            if (i < this.rounds) {
-                                await this.WinnersLight();
-                                await delay(1);
-                            }
-                        }
-                    }
-                }
-
-                if (stop) i = this.rounds + 1;
-
-                if (i > this.rounds) {
-                    this.list = false;
-                    if (listener) this.client.off("messageCreate", listener);
-                    await this.WinnersLight();
-                    delay(2);
-                    this.gameon = false;
-                    return await this.GameEnd();
-                }
-            }
+            await this.FinishGame(stop);
         } catch (error) {
             Print("[RGLC] " + error, "Red");
             ErrorLog("RGLC", error);
         }
     }
 
+    MessageHandler() {
+        this.handlermsg = async (msg) => {
+            if (msg.author.bot) return;
+            if (msg.channel.id === this.channelID) {
+
+                if (!(msg.content.includes("rgl -end") && this.mg.author === msg.author)) {
+                    if (this.light === "Red") {
+                        msg.react("🪦");
+                        this.RedLight(msg);
+                    } else if (this.light === "Green") {
+                        this.GreenLight(msg);
+                    }
+                }
+            }
+        }
+
+        this.listener = (msg) => this.handlermsg(msg)
+        this.client.on("messageCreate", this.listener);
+    }
+
+    async Rounds() {
+        for (this.i = 1; this.i <= this.rounds; this.i++) {
+
+            this.light = this.NEXTLight();
+            this.mg.channel.send(`## Round ${this.i}\n- Everyone can join!`);
+
+            await delay(1)
+            if (this.light === "Red") {
+                this.mg.channel.send({
+                    embeds:
+                        [new EmbedBuilder().setTitle("RED LIGHT").setDescription("🔴 Red Light! Don't TALK or you'll be eliminated!!")]
+                });
+
+                this.timerRed = Math.floor(Math.random() * this.time) + 3;
+                await delay(this.timerRed);
+
+                if (this.i < this.rounds) {
+                    await this.WinnersLight();
+                    await delay(1);
+                }
+            } else {
+                this.mg.channel.send({
+                    embeds:
+                        [new EmbedBuilder().setTitle("GREEN LIGHT").setDescription("🟢 Green Light! TALK to win.")]
+                });
+
+                this.timerGreen = Math.floor(Math.random() * this.time) + 5;
+                await delay(this.timerGreen);
+
+                if (this.i < this.rounds) {
+                    await this.WinnersLight();
+                    await delay(1);
+                }
+            }
+        }
+    }
+
+    async FinishGame(stop) {
+        if (stop) this.i = this.rounds + 1;
+
+        if (this.i > this.rounds) {
+            this.list = false;
+            await this.GameEnd();
+            return;
+        }
+    }
+
+    NEXTLight() {
+        this.current = this.current === "Red" ? "Green" : "Red";
+        return this.current;
+    }
+
     RedLight(msg) {
         try {
-            if (!losers.has(msg.author.id)) {
-                if (participants.has(msg.author.id)) {
-                    participants.delete(msg.author.id)
+            if (!this.losers.has(msg.author.id)) {
+                if (this.participants.has(msg.author.id)) {
+                    this.participants.delete(msg.author.id)
                 }
 
-                losers.set(msg.author.id, 0);
+                this.losers.set(msg.author.id, 0);
             }
         } catch (error) {
             Print("[RGLC] " + error, "Red");
@@ -155,12 +163,12 @@ class RGLGame {
 
     GreenLight(msg) {
         try {
-            if (!losers.has(msg.author.id)) {
-                if (!participants.has(msg.author.id)) {
-                    participants.set(msg.author.id, 1);
+            if (!this.losers.has(msg.author.id)) {
+                if (!this.participants.has(msg.author.id)) {
+                    this.participants.set(msg.author.id, 1);
                 } else {
-                    let count = participants.get(msg.author.id);
-                    participants.set(msg.author.id, count + 1);
+                    let count = this.participants.get(msg.author.id);
+                    this.participants.set(msg.author.id, count + 1);
                 }
             }
         } catch (error) {
@@ -172,19 +180,19 @@ class RGLGame {
     async WinnersLight() {
         try {
             if (!this.list) {
-                if (participants.size === 0 && losers.size === 0) {
+                if (this.participants.size === 0 && this.losers.size === 0) {
                     await deleteRGL(RGLGames, this.guildID, this.channelID)
                     return this.mg.channel.send("## 😞 No one participated!");
                 }
             }
 
-            if (participants.size > 0) {
-                let participantsArray = [...participants.entries()];
+            if (this.participants.size > 0) {
+                let participantsArray = [...this.participants.entries()];
                 participantsArray.sort((a, b) => b[1] - a[1]);
 
                 let winnersC;
                 if (!this.list) {
-                    winnersC = Math.min(participants.size, this.winnerC);
+                    winnersC = Math.min(this.participants.size, this.winnerC);
                     let medals = ["🥇", "🥈", "🥉"]
                     const EmbedWin = new EmbedBuilder()
                         .setColor("Gold").setTitle("👑 Winners 👑");
@@ -196,11 +204,11 @@ class RGLGame {
                         await saveRWinners(RGLC, this.guildID, this.channelID, id);
                     });
 
-                    for (const { id } of topwinners) participants.delete(id);
+                    for (const { id } of topwinners) this.participants.delete(id);
 
                     this.mg.channel.send({ embeds: [EmbedWin] });
                 }
-                if (participants.size > winnersC || this.list) {
+                if (this.participants.size > winnersC || this.list) {
                     const EmbedParti = new EmbedBuilder()
                         .setColor("Green").setTitle("🛡️ Survivors 🛡️");
 
@@ -214,11 +222,11 @@ class RGLGame {
                 }
             }
 
-            if (losers.size > 0) {
+            if (this.losers.size > 0) {
                 const EmbedLoser = new EmbedBuilder()
                     .setColor("DarkButNotBlack").setTitle("🪦 Eliminated 🪦")
 
-                let losersArrayTXT = [...losers.entries()].map((s, i) => `${i + 1} <@${s[0]}> : \`${s[1]}\``).join("\n")
+                let losersArrayTXT = [...this.losers.entries()].map((s, i) => `${i + 1} <@${s[0]}> : \`${s[1]}\``).join("\n")
                 EmbedLoser.addFields({ name: "", value: losersArrayTXT });
 
                 this.mg.channel.send({ embeds: [EmbedLoser] });
@@ -232,10 +240,19 @@ class RGLGame {
 
     async GameEnd() {
         try {
+            this.gameon = false;
+
+            if (this.listener) {
+                this.client.off("messageCreate", this.listener)
+                this.listener = null;
+            }
+
+            await this.WinnersLight();
+
             await gameREnd(RGLGames, this.guildID, this.channelID);
 
-            if (losers.size > 0) losers.clear();
-            if (participants.size > 0 ) participants.clear();
+            if (this.losers.size > 0) this.losers.clear();
+            if (this.participants.size > 0) this.participants.clear();
 
             Print("[RGL] : ended", "Grey")
         } catch (error) {

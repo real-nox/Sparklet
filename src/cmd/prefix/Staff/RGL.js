@@ -8,7 +8,7 @@ let RGL;
 
 module.exports = {
     name: "rgl",
-    staff : true,
+    staff: true,
     async prerun(mg, client) {
         try {
             const guildID = mg.guild.id;
@@ -31,21 +31,23 @@ module.exports = {
             switch (cmdType) {
                 case "start":
                 case "s":
-                    let rounds = parseInt(args[2]);
-                    let time = parseInt(args[3]);
-                    let winnersC = parseInt(args[4]);
+                    let RGLConfig = { 
+                        rounds : parseInt(args[2]), 
+                        time : parseInt(args[3]), 
+                        winnersC : parseInt(args[4])
+                    }
 
                     if (Game) return mg.reply("# There is an ongoing game!");
 
-                    if ((!rounds || !time) || ((rounds > 20 || rounds < 2) || (time > 60 || time < 10) || (winnersC > 3 || winnersC < 1))) {
+                    if ((!RGLConfig.rounds || !RGLConfig.time) || ((RGLConfig.rounds > 20 || RGLConfig.rounds < 2) || (RGLConfig.time > 60 || RGLConfig.time < 10) || (RGLConfig.winnersC > 3 || RGLConfig.winnersC < 1))) {
                         ErrEmbed.setDescription("```Command format is incorrect !rgl -start <rounds> <duration in sec> <(winners) optional 3 by default>```");
                         return mg.reply({ embeds: [ErrEmbed] });
                     }
 
-                    RGL = new RGLGame(client, mg, rounds, time, winnersC);
+                    RGL = new RGLGame(client, mg, RGLConfig);
                     await RGL.Starter();
-                    break;
 
+                    break;
                 case "stop":
                 case "end":
                     if (!Game) {
