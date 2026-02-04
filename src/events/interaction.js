@@ -1,4 +1,4 @@
-const { Client, MessageFlags, EmbedBuilder } = require("discord.js");
+const { Client, MessageFlags, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { Print } = require("../handler/extraHandler");
 const { ErrorLog } = require("../handler/logsHanlder");
 const { getStaffR } = require("../data/ServerDB");
@@ -9,8 +9,9 @@ module.exports = {
 
     /**
     * @param {import("discord.js").Interaction} interaction;
+    * @param {import("discord.js").Client} client;
     */
-    async eventrun(client = Client, interaction) {
+    async eventrun(client, interaction) {
         try {
             if (interaction.isChatInputCommand()) {
                 const { commandName } = interaction;
@@ -59,9 +60,50 @@ module.exports = {
                 }
 
                 if (interaction.customId === `closeT-${interaction.channel.id}-${interaction.member.user.id}`) {
-                    const TicketC = new TicketSystem(interaction, client);
-                    //await interaction.message.edit({content : "hello"})
-                    await TicketC.closeT();
+                    await interaction.message.edit({ components: [] })
+
+                    const close = new ButtonBuilder()
+                        .setLabel("Close")
+                        .setCustomId(`Tclose-${interaction.channel.id}-${interaction.member.user.id}`)
+                        .setStyle(ButtonStyle.Danger)
+
+                    const cancel = new ButtonBuilder()
+                        .setLabel("Cancel")
+                        .setCustomId(`cancelT-${interaction.channel.id}-${interaction.member.user.id}`)
+                        .setStyle(ButtonStyle.Secondary)
+
+                    await interaction.message.reply({
+                        embeds: [new EmbedBuilder().setDescription("Are you sure you want to close this ticket?")],
+                        components: [new ActionRowBuilder().setComponents(close, cancel)]
+                    })
+                }
+
+                if (interaction.customId === `cancelT-${interaction.channel.id}-${interaction.member.user.id}`) {
+                    console.log(interaction.message)
+                    const messageold = interaction.channel.messages.fetch(interaction.message.reference.messageId)
+
+                    const closeBtn = new ButtonBuilder()
+                        .setCustomId(`closeT-${interaction.channel.id}-${interaction.member.user.id}`)
+                        .setEmoji("🔒")
+                        .setLabel("Close")
+                        .setStyle(ButtonStyle.Danger);
+
+                    const claimBtn = new ButtonBuilder()
+                        .setCustomId(`claimT-${interaction.channel.id}-${interaction.member.user.id}`)
+                        .setEmoji("📫")
+                        .setLabel("Claim")
+                        .setStyle(ButtonStyle.Primary);
+
+                    (await messageold).edit({ components: [new ActionRowBuilder().setComponents(closeBtn, claimBtn)] })
+                    await interaction.message.delete()
+                }
+
+                if (interaction.customId === `claimT-${interaction.channel.id}-${interaction.member.user.id}`) {
+                    await new TicketSystem(interaction, client).claimT()
+                }
+
+                if (interaction.customId === `Tclose-${interaction.channel.id}-${interaction.member.user.id}`) {
+
                 }
 
             }

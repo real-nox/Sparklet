@@ -9,6 +9,7 @@ class TicketSystem {
         this.client = client;
 
         this.guild = interaction.guild;
+        this.staffID = null;
     }
 
     //Creation of ticket
@@ -78,6 +79,8 @@ class TicketSystem {
 
                         await this.interaction.reply({ embeds: [ctEmbed], flags: MessageFlags.Ephemeral });
                     }
+
+                    this.staffID = staff ? staff : null
                 } else {
                     await this.interaction.reply({ content: "There is an already registred ticket!", flags: MessageFlags.Ephemeral });
                 }
@@ -151,7 +154,7 @@ class TicketSystem {
     async closeT() {
         try {
             await this.interaction.reply("Closing")
-            
+
 
         } catch (error) {
             Print("[CLOSET] " + error, "Red");
@@ -159,10 +162,22 @@ class TicketSystem {
         }
     }
 
-    async reopenT() {
-        try { } catch (error) {
-            Print("[REOPENT] " + error, "Red");
-            ErrorLog("REOPENT", error);
+    async claimT() {
+        try {
+            const foundDB = await getTCol(TicketS, this.guild.id)
+            const foundRole = foundDB.staffT
+
+            this.staffID = this.staffID !== null ? this.staffID : foundRole
+
+            const haspermission = this.interaction.member.roles.cache.has(this.staffID)
+
+            if (!haspermission) {
+                await this.interaction.reply({ content: "You aren't a staff to claim this ticket!", flags: MessageFlags.Ephemeral })
+                return
+            }
+        } catch (error) {
+            Print("[CLAIM] " + error, "Red");
+            ErrorLog("CLAIM", error);
         }
     }
 
