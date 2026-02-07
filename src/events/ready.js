@@ -1,7 +1,7 @@
-const { ActivityType } = require("discord.js");
-const { Print } = require("../handler/extraHandler");
+import { ActivityType } from "discord.js";
+import { Print } from "../handler/extraHandler.js"
 
-module.exports = {
+export default {
     name : "clientReady",
     eventrun(client) {
         Print("[CLIENT] Bot Is functioning", "Green");

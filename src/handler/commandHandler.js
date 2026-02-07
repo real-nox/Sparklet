@@ -1,18 +1,23 @@
-const { config } = require("dotenv"); config({ quiet: true });
-const { REST, Routes } = require("discord.js");
-const { Print } = require("./extraHandler");
-const path = require("path");
-const fs = require("fs");
+import { config } from "dotenv"; config({ quiet: true });
+
+import { REST, Routes } from "discord.js";
+import { Print } from "./extraHandler.js";
+import { ErrorLog } from "../systems/LogSystem.js";
+
+import path from "path";
+import fs from "fs";
 
 const cmds = [];
 const prefixs = [];
 
-const asciiTable = require("ascii-table");
-const { ErrorLog } = require("./logsHanlder");
+import asciiTable from "ascii-table";
+import { fileURLToPath, pathToFileURL } from "url";
+
 const cmdTable = new asciiTable("Commands");
 cmdTable.setHeading("Name", "Type", "Execute");
 
-function commandHandler(client) {
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+export async function commandHandler(client) {
     try {
         const CMDFolder = path.join(__dirname, "../cmd/slash");
         const PREFolder = path.join(__dirname, "../cmd/prefix");
@@ -26,7 +31,8 @@ function commandHandler(client) {
                 try {
                     const filepath = path.join(`${CMDFolder}/${folder}`, file);
 
-                    const cmd = require(filepath);
+                    const module_cmd = await import(pathToFileURL(filepath).href);
+                    const cmd = module_cmd.default ?? module_cmd
 
                     if ('data' in cmd && 'execute' in cmd) {
                         client.commands.set(cmd.data.name, cmd);
@@ -36,7 +42,7 @@ function commandHandler(client) {
                         cmdTable.addRow(file, "Slash", "Unloaded");
                     }
                 } catch (error) {
-                    Print("[COMMANDS] " + error, "Red");
+                    Print("[COMMANDS Files] " + error, "Red");
                     ErrorLog("COMMANDS", error);
                 }
             }
@@ -51,7 +57,7 @@ function commandHandler(client) {
                 try {
                     const filepath = path.join(`${PREFolder}/${folder}`, file);
 
-                    const pre = require(filepath);
+                    const pre = await import(pathToFileURL(filepath).href);
 
                     if (pre.prerun || pre.name) {
                         client.prefixs.set(pre.name, pre);
@@ -61,7 +67,7 @@ function commandHandler(client) {
                         cmdTable.addRow(file, "Prefix", "Unloaded");
                     }
                 } catch (error) {
-                    Print("[COMMANDS] " + error, "Red");
+                    Print("[COMMANDS Files] " + error, "Red");
                     ErrorLog("COMMANDS", error);
                 }
             }
@@ -76,7 +82,7 @@ function commandHandler(client) {
                 const data = await rest.put(Routes.applicationCommands(client.user.id), { body: cmds });
                 Print(`> Successfully reloaded ${data.length} application (/) commands.`, "Green");
             } catch (error) {
-                Print("[COMMANDS] " + error, "Red");
+                Print("[COMMANDS Files] " + error, "Red");
                 ErrorLog("COMMANDS", error);
             }
         })()
@@ -85,4 +91,3 @@ function commandHandler(client) {
         ErrorLog("COMMANDS", error);
     }
 }
-module.exports = { commandHandler }

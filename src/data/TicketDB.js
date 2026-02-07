@@ -1,40 +1,14 @@
-const { Schema, model } = require("mongoose");
-const { Print } = require("../handler/extraHandler");
-const { ErrorLog } = require("../handler/logsHanlder");
+import { ErrorLog } from "../systems/LogSystem.js"
+import { Print } from "../handler/extraHandler.js"
 
-const TicketSC = new Schema({
-    guildId: {
-        type: String,
-        required: true
-    },
-    channelId: {
-        type: String,
-        required: true
-    },
-    categoryId: {
-        type: String,
-        required: false
-    },
-    transcriptId: {
-        type: String,
-        required: false
-    },
-    staffT: {
-        type: String,
-        required: false
-    }
-});
-
-const TicketS = model("Tickets", TicketSC);
-
-async function getTCol(DB, guildID) {
+export async function getTCol(DB, guildID) {
     const TicketR = await DB.findOne({ guildId: guildID });
 
     if (!TicketR) return false;
     return TicketR;
 }
 
-async function createTCol(DB, guildID, ticketConfig) {
+export async function createTCol(DB, guildID, ticketConfig) {
     try {
         let { channel, category, transcription, staff } = ticketConfig;
 
@@ -46,5 +20,3 @@ async function createTCol(DB, guildID, ticketConfig) {
         ErrorLog("TICKETCreateC", error);
     }
 }
-
-module.exports = { TicketS, getTCol, createTCol };

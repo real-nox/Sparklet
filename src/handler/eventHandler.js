@@ -1,14 +1,18 @@
-const { Print } = require("./extraHandler");
-const path = require("path");
-const fs = require("fs");
+import path from "path";
+import fs from "fs";
 
-const asciiTable = require("ascii-table");
-const { ErrorLog } = require("./logsHanlder");
+import asciiTable from "ascii-table";
+
+import { ErrorLog } from "../systems/LogSystem.js";
+import { Print } from "./extraHandler.js";
+import { fileURLToPath, pathToFileURL } from "url";
+
 let table = new asciiTable('Events');
 
 table.setHeading("Name", "Execute");
 
-function eventHandler(client) {
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+export async function eventHandler(client) {
     try {
         const eventsFolder = path.join(__dirname, '../events');
         const eventsFiles = fs.readdirSync(eventsFolder).filter((file) => file.endsWith(".js"));
@@ -16,7 +20,10 @@ function eventHandler(client) {
         for (const file of eventsFiles) {
 
             const filepath = path.join(eventsFolder, file);
-            const event = require(filepath);
+
+            const module_ev = await import(pathToFileURL(filepath).href);
+            const event = module_ev.default ?? module_ev
+
             if (!event.name) { 
                 table.addRow(file, "Unloaded") ;
             } else {
@@ -36,5 +43,3 @@ function eventHandler(client) {
         ErrorLog("EVENTS", err);
     }
 }
-
-module.exports = { eventHandler }

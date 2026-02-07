@@ -1,9 +1,8 @@
-const { EmbedBuilder } = require("discord.js");
-const { gameRStart, saveRWinners, gameREnd, deleteRGL, RGLGames, RGLC } = require("../data/RGLDB");
-const { delay, Print } = require("../handler/extraHandler");
-const { ErrorLog, EventLog } = require("../handler/logsHanlder");
+import { EmbedBuilder } from "discord.js";
+import { delay, Print } from "../handler/extraHandler.js";
+import { ErrorLog, EventLog } from "./LogSystem.js";
 
-class RGLGame {
+export default class RGLGame {
 
     constructor(client, mg, RGLConfig) {
         this.guildID = mg.guild.id;
@@ -261,5 +260,3 @@ class RGLGame {
         }
     }
 }
-
-module.exports = RGLGame

@@ -4,17 +4,18 @@
   "description": "Sparklet bot",
   "main": "src/core.js",
   "scripts": {
-    "test": "nodemon src/core.js"
+    "dev": "nodemon src/core.js",
+    "test": "pm2 start src/core.js -name testing"
   },
+  "type": "module",
   "author": "Ranox",
   "license": "ISC",
   "dependencies": {
     "@2toad/profanity": "^3.2.0",
+    "@supabase/supabase-js": "^2.95.3",
     "ascii-table": "^0.0.9",
     "colors": "^1.4.0",
     "discord.js": "^14.25.1",
-    "dotenv": "^17.2.3",
-    "mongodb": "^7.0.0",
-    "mongoose": "^9.1.3"
+    "dotenv": "^17.2.3"
   }
 }

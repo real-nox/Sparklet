@@ -1,9 +1,8 @@
-const { EmbedBuilder } = require("discord.js");
-const { ServerC, getStaffR, setStaffR } = require("../../../data/ServerDB");
-const { Print } = require("../../../handler/extraHandler");
-const { ErrorLog } = require("../../../handler/logsHanlder");
+import { EmbedBuilder } from "discord.js"
+import { Print } from "../../../handler/extraHandler.js"
+import { ErrorLog } from "../../../systems/LogSystem.js";
 
-module.exports = {
+export default {
     name: "staff-role",
     admin: true,
     cooldown: 50000,

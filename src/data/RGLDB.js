@@ -1,8 +1,7 @@
-const { ErrorLog } = require("../handler/logsHanlder");
-const { Print } = require("../handler/extraHandler");
-const { Schema, model } = require("mongoose");
+import { Print } from "../handler/extraHandler"
+import { ErrorLog } from "../systems/LogSystem";
 
-const RGLGamesSC = new Schema(
+/*const RGLGamesSC = new Schema(
     {
         guildID: {
             type: String,
@@ -33,9 +32,9 @@ const RGLDSC = new Schema(
 )
 
 let RGLGames = model("RGLG", RGLGamesSC);
-let RGLC = model("RGLC", RGLDSC);
+let RGLC = model("RGLC", RGLDSC);*/
 
-async function gameRStart(data, guildId, channelId) {
+export async function gameRStart(data, guildId, channelId) {
     try {
         const ongame = await getRGameOngoing(data, guildId, channelId);
 
@@ -51,7 +50,7 @@ async function gameRStart(data, guildId, channelId) {
     }
 }
 
-async function gameREnd(data, guildId, channelId) {
+export async function gameREnd(data, guildId, channelId) {
     try {
         let ongame = await getRGameOngoing(data, guildId, channelId);
 
@@ -68,7 +67,7 @@ async function gameREnd(data, guildId, channelId) {
     }
 }
 
-async function saveRWinners(data, guildId, channelId, winnerId) {
+export async function saveRWinners(data, guildId, channelId, winnerId) {
     try {
         let ongame = await getRGameOngoing(RGLGames, guildId, channelId);
 
@@ -84,7 +83,7 @@ async function saveRWinners(data, guildId, channelId, winnerId) {
     }
 }
 
-async function getRGameOngoing(data, guildId, channelId) {
+export async function getRGameOngoing(data, guildId, channelId) {
     try {
         let resultat = await data.findOne({ guildID: guildId, channelID: channelId, ongoing: true })
 
@@ -96,7 +95,7 @@ async function getRGameOngoing(data, guildId, channelId) {
     }
 }
 
-async function deleteRGL(data, guildId, channelId) {
+export async function deleteRGL(data, guildId, channelId) {
     try {
         const ongame = await getRGameOngoing(data, guildId, channelId);
 
@@ -112,5 +111,3 @@ async function deleteRGL(data, guildId, channelId) {
         ErrorLog("RGLDB", err);
     }
 }
-
-module.exports = { RGLGames, RGLC, gameRStart, saveRWinners, gameREnd, getRGameOngoing, deleteRGL }

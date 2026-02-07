@@ -1,9 +1,8 @@
-const { time, TimestampStyles } = require("discord.js");
-const { EcoC, getBalC, Earns } = require("../../../data/EconomyDB");
-const { Print } = require("../../../handler/extraHandler");
-const { ErrorLog } = require("../../../handler/logsHanlder");
+import { time, TimestampStyles } from "discord.js";
+import { Print } from "../../../handler/extraHandler.js";
+import { ErrorLog } from "../../../systems/LogSystem.js";
 
-module.exports = {
+export default {
     name: "earns",
     cooldown: 2000,
     async prerun(mg) {

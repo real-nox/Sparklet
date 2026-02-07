@@ -1,11 +1,13 @@
-const { commandHandler } = require("./handler/commandHandler");
-const { config } = require("dotenv"); config({ quiet: true });
-const { eventHandler } = require("./handler/eventHandler");
-const { ErrorLog } = require("./handler/logsHanlder");
-const { Print } = require("./handler/extraHandler");
-const { LoadDB } = require("./handler/dbHandler");
+import { config } from "dotenv"; config({ quiet: true });
 
-const discord = require("discord.js");
+import { commandHandler } from "./handler/commandHandler.js";
+import { eventHandler } from "./handler/eventHandler.js";
+import { LoadDB } from "./handler/dbHandler.js";
+
+import { ErrorLog } from "./systems/LogSystem.js";
+import { Print } from "./handler/extraHandler.js";
+
+import discord from "discord.js";
 
 //Settings
 const token = process.env.TOKEN;
@@ -27,11 +29,11 @@ bot.cooldowns = new discord.Collection();
 
 bot.login(token).then(async () => {
     try {
-        eventHandler(bot);
-        commandHandler(bot);
+        await eventHandler(bot);
+        await commandHandler(bot);
         await LoadDB();
     } catch (err) {
-        Print("[ERROR] " + err, "Red");
+        Print("[ERROR BOT] " + err, "Red");
         ErrorLog("BOT Launch", err)
     }
 });

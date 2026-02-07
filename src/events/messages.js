@@ -1,9 +1,8 @@
-const { getPrefix, getStaffR, ServerC } = require("../data/ServerDB");
-const { ErrorLog } = require("../handler/logsHanlder");
-const { Print } = require("../handler/extraHandler");
-const { EmbedBuilder, time, TimestampStyles } = require("discord.js");
+import { ErrorLog } from "../systems/LogSystem.js"
+import { Print } from "../handler/extraHandler.js"
+import { EmbedBuilder, time, TimestampStyles } from "discord.js";
 
-module.exports = {
+export default {
     name: "messageCreate",
     async eventrun(client, mg) {
         try {

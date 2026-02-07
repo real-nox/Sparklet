@@ -1,39 +1,7 @@
-const { ErrorLog } = require("../handler/logsHanlder");
-const { Print } = require("../handler/extraHandler");
-const { Schema, model } = require("mongoose");
+import { Print } from "../handler/extraHandler.js";
+import { ErrorLog } from "../systems/LogSystem.js";
 
-const EconomySchema = new Schema(
-    {
-        userID: {
-            type: String,
-            required: true
-        },
-        guildID: {
-            type: String,
-            required: true
-        },
-        balance: {
-            type: Number,
-            required: false
-        },
-        earnc: {
-            type: Number,
-            required: false
-        },
-        dailyc: {
-            type: Number,
-            required: false
-        },
-        coinfc: {
-            type: Number,
-            required: false
-        }
-    }
-);
-
-let EcoC = model("eco", EconomySchema);
-
-async function getBalC(DB, userId, guildId) {
+export async function getBalC(DB, userId, guildId) {
     try {
         let data = await DB.findOne({ userID: userId, guildID: guildId })
 
@@ -55,7 +23,7 @@ async function getBalC(DB, userId, guildId) {
 }
 
 //Earn Sparks
-async function Earns(DB, userId, guildId, bal, cooldown, found) {
+export async function Earns(DB, userId, guildId, bal, cooldown, found) {
     try {
 
         if (!found)
@@ -69,7 +37,7 @@ async function Earns(DB, userId, guildId, bal, cooldown, found) {
 }
 
 //Daily Sparks
-async function Dailys(DB, userId, guildId, bal, cooldown, found) {
+export async function Dailys(DB, userId, guildId, bal, cooldown, found) {
     try {
         if (!found)
             return await DB.create({ userID: userId, guildID: guildId, balance: bal, dailyc: cooldown });
@@ -82,7 +50,7 @@ async function Dailys(DB, userId, guildId, bal, cooldown, found) {
 }
 
 //CF sparks
-async function Coinflips(DB, userId, guildId, bal, cooldown) {
+export async function Coinflips(DB, userId, guildId, bal, cooldown) {
     try {
         return await DB.updateOne({ userID: userId, guildID: guildId }, { $set: { balance: bal, coinfc: cooldown } });
     } catch (error) {
@@ -90,5 +58,3 @@ async function Coinflips(DB, userId, guildId, bal, cooldown) {
         ErrorLog("CFDB", error);
     }
 }
-
-module.exports = { EcoC, getBalC, Earns, Dailys, Coinflips };

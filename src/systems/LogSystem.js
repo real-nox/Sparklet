@@ -1,9 +1,7 @@
-const { WebhookClient, EmbedBuilder } = require("discord.js");
-const { Print } = require("./extraHandler");
-const { config } = require("dotenv");
-config({ quiet: true });
+import { EmbedBuilder, WebhookClient } from "discord.js";
+import { Print } from "../handler/extraHandler.js";
 
-function ErrorLog(title, message) {
+export function ErrorLog(title, message) {
     try {
         const webURI = process.env.WEBURL;
         const webhook = new WebhookClient({ url: webURI });
@@ -16,7 +14,7 @@ function ErrorLog(title, message) {
     }
 }
 
-function EventLog(message) {
+export function EventLog(message) {
     try {
         const webURI = process.env.WEBURLEVENT;
         const webhook = new WebhookClient({ url: webURI });
@@ -29,7 +27,7 @@ function EventLog(message) {
     }
 }
 
-function SuggestionLog(user, message) {
+export function SuggestionLog(user, message) {
     try {
         const webURI = process.env.WEBURLSUGGESTIONS;
         const webhook = new WebhookClient({ url: webURI });
@@ -44,5 +42,3 @@ function SuggestionLog(user, message) {
         Print("[ERROR] : " + err, "Red");
     }
 }
-
-module.exports = { ErrorLog, EventLog, SuggestionLog }

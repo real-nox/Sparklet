@@ -1,9 +1,9 @@
-const { SlashCommandBuilder, MessageFlags } = require("discord.js");
-const { SuggestionLog, ErrorLog } = require("../../../handler/logsHanlder");
-const { Print } = require("../../../handler/extraHandler");
-const { profanity } = require("@2toad/profanity");
+import { SlashCommandBuilder, MessageFlags } from "discord.js";
+import { SuggestionLog, ErrorLog } from "../../../systems/LogSystem.js";
+import { Print } from "../../../handler/extraHandler.js";
+import { profanity } from "@2toad/profanity";
 
-module.exports = {
+export default {
     cooldown : 50000,
     data: new SlashCommandBuilder()
         .setName('suggest')

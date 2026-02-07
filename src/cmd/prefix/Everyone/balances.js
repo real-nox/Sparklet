@@ -1,6 +1,7 @@
-const { getBalC, EcoC } = require("../../../data/EconomyDB");
+import { Print } from "../../../handler/extraHandler.js";
+import { ErrorLog } from "../../../systems/LogSystem.js";
 
-module.exports = {
+export default {
     name: "bal",
     async prerun(mg) {
         try {

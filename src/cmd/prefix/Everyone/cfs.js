@@ -1,9 +1,8 @@
-const { EmbedBuilder, TimestampStyles, time } = require("discord.js");
-const { EcoC, getBalC, Coinflips } = require("../../../data/EconomyDB");
-const { ErrorLog } = require("../../../handler/logsHanlder");
-const { Print } = require("../../../handler/extraHandler");
+import { EmbedBuilder, TimestampStyles, time } from "discord.js";
+import { Print } from "../../../handler/extraHandler.js"
+import { ErrorLog } from "../../../systems/LogSystem.js";
 
-module.exports = {
+export default {
     name: "coinflip",
     cooldown: 2000,
     async prerun(mg) {

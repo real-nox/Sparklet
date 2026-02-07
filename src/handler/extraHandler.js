@@ -1,8 +1,9 @@
-const { config } = require("dotenv"); config({ quiet: true })
-const { green, yellow, red, blue, cyan, grey } = require("colors");
+import { config } from "dotenv"; config({ quiet: true })
+import colors from "colors";
 
-function Print(message, type = "Green") {
+export function Print(message, type = "Green") {
     try {
+        const { green, yellow, red, blue, cyan, grey } = colors
         if (type == "Green")
             console.log(green(message))
         if (type == "Yellow")
@@ -20,9 +21,7 @@ function Print(message, type = "Green") {
     }
 }
 
-async function delay(time) {
-    time = time*1000;
+export async function delay(time) {
+    time = time * 1000;
     return new Promise(reso => setTimeout(reso, time));
 }
-
-module.exports = { Print, delay }

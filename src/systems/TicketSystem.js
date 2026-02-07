@@ -1,9 +1,8 @@
-const { EmbedBuilder, ChannelType, ButtonBuilder, ButtonStyle, ActionRowBuilder, MessageFlags, PermissionFlagsBits } = require("discord.js");
-const { Print } = require("../handler/extraHandler");
-const { ErrorLog } = require("../handler/logsHanlder");
-const { createTCol, TicketS, getTCol } = require("../data/TicketDB");
+import { EmbedBuilder, ChannelType, ButtonBuilder, ButtonStyle, ActionRowBuilder, MessageFlags, PermissionFlagsBits } from "discord.js";
+import { Print } from "../handler/extraHandler.js";
+import { ErrorLog } from "./LogSystem.js";
 
-class TicketSystem {
+export class TicketSystem {
     constructor(interaction, client) {
         this.interaction = interaction;
         this.client = client;
@@ -195,5 +194,3 @@ class TicketSystem {
         }
     }
 }
-
-module.exports = { TicketSystem }

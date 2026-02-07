@@ -1,10 +1,9 @@
-const { Client, MessageFlags, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const { Print } = require("../handler/extraHandler");
-const { ErrorLog } = require("../handler/logsHanlder");
-const { getStaffR } = require("../data/ServerDB");
-const { TicketSystem } = require("../classes/TicketSystem");
+import { Client, MessageFlags, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { Print } from "../handler/extraHandler.js";
+import { TicketSystem } from "../systems/TicketSystem.js";
+import { ErrorLog } from "../systems/LogSystem.js";
 
-module.exports = {
+export default {
     name: "interactionCreate",
 
     /**

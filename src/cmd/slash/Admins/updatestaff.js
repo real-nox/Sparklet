@@ -1,9 +1,8 @@
-const { SlashCommandBuilder, MessageFlags, EmbedBuilder } = require("discord.js");
-const { ServerC, getStaffR, setStaffR } = require("../../../data/ServerDB");
-const { Print } = require("../../../handler/extraHandler");
-const { ErrorLog } = require("../../../handler/logsHanlder");
+import { SlashCommandBuilder, MessageFlags, EmbedBuilder } from "discord.js";
+import { Print } from "../../../handler/extraHandler.js";
+import { ErrorLog } from "../../../systems/LogSystem.js";
 
-module.exports = {
+export default {
     admin: true,
     cooldown: 50000,
     data: new SlashCommandBuilder()

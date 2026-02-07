@@ -1,16 +1,17 @@
-const { EmbedBuilder } = require("discord.js");
-const { setGuild, getGuild } = require("../data/ServerDB");
-const { DB } = require("../handler/dbHandler");
-const { Print } = require("../handler/extraHandler");
-const { ErrorLog } = require("../handler/logsHanlder");
+import { EmbedBuilder } from "discord.js";
+import { DB } from "../handler/dbHandler.js";
+import { Print } from "../handler/extraHandler.js";
+import ServerDB from "../data/ServerDB.js";
+import { ErrorLog } from "../systems/LogSystem.js";
 
-module.exports = {
+export default {
     name: "guildCreate",
     async eventrun(client, guild) {
         try {
             let guildID = guild.id;
+            const server = new ServerDB(guildID)
 
-            let resultat = await getGuild(DB, guildID);
+            let resultat = await server.getGuild(DB, guildID);
 
             if (resultat.length == 0) {
                 if (guild.systemChannel) {
@@ -23,7 +24,7 @@ module.exports = {
                     guild.systemChannel.send({embeds : [JoinBed]});
                 }
 
-                await setGuild(DB, guild.id);
+                await server.setGuild(DB, guild.id);
             }
         } catch (err) {
             Print("[ERROR] " + err, "Red");

@@ -1,9 +1,9 @@
-const { SlashCommandBuilder, ChannelType } = require("discord.js");
-const { TicketSystem } = require("../../../classes/TicketSystem");
-const { Print } = require("../../../handler/extraHandler");
-const { ErrorLog } = require("../../../handler/logsHanlder");
+import { SlashCommandBuilder, ChannelType } from "discord.js";
+import { TicketSystem } from "../../../systems/TicketSystem.js";
+import { Print } from "../../../handler/extraHandler.js";
+import { ErrorLog } from "../../../systems/LogSystem.js";
 
-module.exports = {
+export default {
     cooldown: 10000,
     data: new SlashCommandBuilder()
         .setName("ticket")

@@ -1,12 +1,11 @@
-const { getRGameOngoing, deleteRGL, RGLGames } = require("../../../data/RGLDB");
-const { ErrorLog } = require("../../../handler/logsHanlder");
-const { Print } = require("../../../handler/extraHandler");
-const RGLGame = require("../../../classes/RGLFunction");
-const { EmbedBuilder } = require("discord.js");
+import { Print } from "../../../handler/extraHandler.js";
+import RGLGame from "../../../systems/RGLFunction.js";
+import { EmbedBuilder } from "discord.js";
+import { ErrorLog } from "../../../systems/LogSystem.js";
 
 let RGL;
 
-module.exports = {
+export default {
     name: "rgl",
     staff: true,
     async prerun(mg, client) {
