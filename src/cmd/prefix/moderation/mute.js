@@ -4,8 +4,8 @@ import { ErrorLog, incorrectformcmd } from "../../../systems/LogSystem.js";
 
 export default {
     name: "mute",
-    staff: true,
-    async prerun(mg = Message) {
+    owner: true,
+    async prerun(mg) {
         try {
             const args = mg.content.toLowerCase().split(" ")
             let member
@@ -32,7 +32,10 @@ export default {
             if (member.roles.highest.position > mg.member.roles.highest.position)
                 return mg.reply({ embeds: [errorEmbed("- Cannot mute high rank.")] })
 
-            if (args[2] && args[2].length > 250)
+            if (member.communicationDisabledUntilTimestamp && member.communicationDisabledUntilTimestamp > Date.now())
+                mg.channel.send({ embeds: [errorEmbed("Member is in timeout")] })
+
+            if (args[3] && args[3].length > 250)
                 return mg.reply({ embeds: [errorEmbed("- Cannot send long reason!")] })
 
             let timeFormat = {
@@ -41,16 +44,21 @@ export default {
                 d: 86400, days: 86400
             };
 
-            let timeT = null
-            if (args[3]) {
-                const unit = Object.keys(timeFormat)
-                    .sort((a, b) => b.length - a.length)
-                    .find(char => args[3].endsWith(char))
+            const max = 2419200000
 
-                const value = Number(args[3].slice(0, -unit.length));
-                if (!unit || !Number.isInteger(value) || value <= 0)
-                    return mg.reply({ embeds: [errorEmbed("- Provide a correct duration.\n**Ex:** `10m` or `10mins`\n- You can use (`m` `mins`) or (`h` `hours`) or (`d` `days`)")] })
-                timeT = Math.floor(Date.now() / 1000) + value * timeFormat[unit]
+            let timeT = null
+            let value = null
+            let unit = null
+
+            if (args[2]) {
+                unit = Object.keys(timeFormat)
+                    .sort((a, b) => b.length - a.length)
+                    .find(char => args[2].endsWith(char))
+
+                value = Number(args[2].slice(0, -unit.length)) * timeFormat[unit] * 1000;
+                console.log(value)
+                if (!unit || !Number.isInteger(value) || value <= 0 || value > max)
+                    return mg.reply({ embeds: [errorEmbed("- Provide a correct duration.\n**Ex:** `10m` or `10mins`\n- You can use (`m` `mins`) or (`h` `hours`) or (`d` `days`)\n- Max days 28days!")] })
             }
 
             const mutedRole = mg.guild.roles.cache.find(r => r.name === "Muted")
@@ -76,20 +84,16 @@ export default {
                 }
             }
 
-            await member.timeout(value * timeFormat[unit], `Muted ${member.id} by ${mg.member.id}: ${args[2]}`)
+            if (!value)
+                value = 2419200000
+
+            timeT = Math.floor((Date.now() + value) / 1000)
+
+            console.log(timeT)
+            await member.timeout(value, `Muted ${member.id} by ${mg.member.id}: ${args[2]}`)
+            //28days max
             const dmembed = new EmbedBuilder()
-                .setFields(
-                    {
-                        name: "Reason",
-                        value: `> ${args[2] ? args[2] : "Not provided"}`
-                    },
-                    {
-                        name: "Duration",
-                        value: `${time(timeT, TimestampStyles.ShortTime)}`
-                    }
-                )
-                .setAuthor({ name: `You have been muted in ${mg.guild.name}` })
-                .setColor("Yellow")
+                .setDescription(`> **Reason:** ${args[2] ? args[2] : "Not provided"}\n> **Duration:** ${time(timeT, TimestampStyles.RelativeTime)}`)
 
             const row = new ActionRowBuilder().setComponents(
                 new ButtonBuilder()
@@ -99,21 +103,12 @@ export default {
             )
 
             const embed = new EmbedBuilder()
-                .setFields(
-                    {
-                        name: "Reason",
-                        value: `> ${args[2] ? args[2] : "Not provided"}`
-                    },
-                    {
-                        name: "Duration",
-                        value: `${time(timeT, TimestampStyles.ShortTime)}`
-                    }
-                )
+                .setDescription(`> **Reason:** ${args[2] ? args[2] : "Not provided"}\n> **Duration:** ${time(timeT, TimestampStyles.RelativeTime)}`)
 
-            /*member.send({ embeds: [dmembed], components: [row] }).catch((err) => {
+            member.send({ embeds: [dmembed], components: [row] }).catch((err) => {
                 console.log(err)
                 embed.addFields({ name: "Error", value: "Couldn't reach member's DM!" })
-            })*/
+            })
 
             embed.setAuthor({ name: `${member.user.username} muted` }).setColor("Green")
             mg.channel.send({ embeds: [embed] })

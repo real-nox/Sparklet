@@ -5,7 +5,7 @@ import { ErrorLog, incorrectformcmd } from "../../../systems/LogSystem.js";
 export default {
     name: "warn",
     aliases: ["wr"],
-    staff: true,
+    owner: true,
     async prerun(mg) {
         try {
             const args = mg.content.split(" ")
@@ -37,29 +37,19 @@ export default {
                 return mg.reply({ embeds: [errorEmbed("- Cannot send long reason!")] })
 
             const dmembed = new EmbedBuilder()
-                .setFields(
-                    {
-                        name: "Reason",
-                        value: `> ${args[2] ? args[2] : "Not provided"}`
-                    }
-                )
+                .setDescription(`> **Reason:** ${args[2] ? args[2] : "Not provided"}`)
                 .setAuthor({ name: `You have been warned in ${mg.guild.name}` })
                 .setColor("Yellow")
 
-                const row = new ActionRowBuilder().setComponents(
-                    new ButtonBuilder()
+            const row = new ActionRowBuilder().setComponents(
+                new ButtonBuilder()
                     .setStyle(ButtonStyle.Link)
                     .setURL(`https://discord.com/channels/${mg.guild.id}/${mg.channel.id}`)
                     .setLabel(`Sent from ${mg.guild.name}`)
-                )
+            )
 
             const embed = new EmbedBuilder()
-                .setFields(
-                    {
-                        name: "Reason",
-                        value: `> ${args[2] ? args[2] : "Not provided"}`
-                    }
-                )
+                .setDescription(`> **Reason:** ${args[2] ? args[2] : "Not provided"}`)
 
             member.send({ embeds: [dmembed], components: [row] }).catch((err) => {
                 console.log(err)

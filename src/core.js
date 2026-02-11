@@ -10,7 +10,7 @@ import { Print } from "./handler/extraHandler.js";
 import { Client, Collection, GatewayIntentBits } from "discord.js";
 
 //Settings
-const token = process.env.TOKEN;
+let token = process.env.TOKEN;
 
 const bot = new Client({
     intents: [

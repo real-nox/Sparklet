@@ -1,11 +1,11 @@
 import { EmbedBuilder, time, TimestampStyles } from "discord.js"
-import { ErrorLog, incorrectformcmd } from "../../../systems/LogSystem.js"
+import { ErrorLog } from "../../../systems/LogSystem.js"
 import { Print } from "../../../handler/extraHandler.js"
 
 export default {
     name: "whois",
     aliases: ["wh"],
-    staff: true,
+    owner: true,
     async prerun(mg, client) {
         try {
             const args = mg.content.split(" ")
