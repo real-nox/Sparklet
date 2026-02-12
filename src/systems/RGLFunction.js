@@ -19,7 +19,7 @@ export default class RGLGame {
         this.timerRed;
         this.timerGreen;
 
-        this.current = Math.random() < 0.5 ? "Red" : "Green";
+        this.current = Math.random() < 0.4 ? "Red" : "Green";
 
         this.winnerC = RGLConfig.winnersC ? RGLConfig.winnersC : 3
         this.light;

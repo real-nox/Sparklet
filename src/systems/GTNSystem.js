@@ -101,9 +101,11 @@ export default class GTNGame {
         this.msgHandler = null
 
         this.msg.channel.send({ embeds: [new EmbedBuilder().setColor("Gold").setTimestamp().setDescription(`Congratulations ${winner}!!\n- You have won\n\n-# Guessed number : \`${this.guessN}\``).setThumbnail(winner.displayAvatarURL({ dynamic: true, size: 1024 }))] })
+        return this.End()
     }
 
-    async Stop() {
+
+    async End() {
         this.guessN = null
         this.newstart = null
         this.newend = null
@@ -111,6 +113,11 @@ export default class GTNGame {
         this.msgHandler = null
 
         this.gameOn = false
+        await this.db.endGame()
+    }
+
+    async Delete() {
+        await this.End()
         await this.db.deleteGame()
     }
 }

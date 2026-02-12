@@ -7,6 +7,7 @@ import GTNGame from "../../../systems/GTNSystem.js";
 let GTN = null
 export default {
     name: "gtn",
+    cooldown: 1000,
     aliases: ["guessthenumber"],
     staff: true,
     async prerun(msg, client) {
@@ -60,7 +61,7 @@ export default {
                 case "end":
                     msg.channel.send("Ending game!")
                     if (GTN)
-                        await GTN.Stop()
+                        await GTN.Delete()
                     else 
                         await GTNdb.endGame()
                     break
